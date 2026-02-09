@@ -7,6 +7,9 @@
     <title>{{ config('app.name') }} - @yield('title', 'Trang chủ')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Flatpickr Date Picker -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/airbnb.css">
     <style>
         /* === UX tối ưu cho người dùng lớn tuổi === */
         body { font-size: 16px; background: #fafbfc; }
@@ -248,6 +251,36 @@
             });
         });
     </script>
+    
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vn.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize all date pickers with Vietnamese locale
+            const dateInputs = document.querySelectorAll('input[type="date"], .date-picker');
+            dateInputs.forEach(input => {
+                // Change type to text so Flatpickr can style it
+                if (input.type === 'date') {
+                    input.type = 'text';
+                }
+                
+                flatpickr(input, {
+                    locale: 'vn',
+                    dateFormat: 'Y-m-d',
+                    altInput: true,
+                    altFormat: 'd/m/Y',
+                    allowInput: true,
+                    disableMobile: true,
+                    // Large, easy to click UI
+                    static: false,
+                    appendTo: document.body,
+                    defaultDate: input.value || null
+                });
+            });
+        });
+    </script>
+
     @stack('scripts')
 </body>
 </html>
