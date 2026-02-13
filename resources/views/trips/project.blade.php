@@ -50,6 +50,30 @@
     </div>
 </div>
 
+{{-- Biểu đồ chi tiết dự án --}}
+<div class="row g-3 mb-4">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 border-0">
+                <h6 class="mb-0 fw-bold"><i class="bi bi-graph-up text-primary"></i> Xu hướng doanh thu & Khối lượng</h6>
+            </div>
+            <div class="card-body">
+                <div id="projectTrendChart"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 border-0">
+                <h6 class="mb-0 fw-bold"><i class="bi bi-pie-chart text-success"></i> Cơ cấu vật liệu</h6>
+            </div>
+            <div class="card-body">
+                <div id="projectMaterialChart"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {{-- Danh sách tháng --}}
 <div class="row">
     @forelse($months as $m)
@@ -100,7 +124,87 @@
     @endforelse
 </div>
 
-@push('styles')
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Biểu đồ xu hướng (Doanh thu & Khối lượng)
+    var trendOptions = {
+        series: [{
+            name: 'Doanh thu (đ)',
+            type: 'column',
+            data: @json($chartRevenue)
+        }, {
+            name: 'Khối lượng (m³)',
+            type: 'line',
+            data: @json($chartVolume)
+        }],
+        chart: {
+            id: 'projectTrendChart',
+            height: 300,
+            type: 'line',
+            toolbar: { show: false }
+        },
+        stroke: { width: [0, 4] },
+        colors: ['#0d6efd', '#198754'],
+        xaxis: { categories: @json($chartMonths) },
+        yaxis: [{
+            title: { text: 'Doanh thu' },
+            labels: {
+                formatter: function (val) { return new Intl.NumberFormat('vi-VN').format(val); }
+            }
+        }, {
+            opposite: true,
+            title: { text: 'Khối lượng' }
+        }],
+        tooltip: {
+            shared: true,
+            intersect: false,
+            y: {
+                formatter: function (y) {
+                    if (typeof y !== "undefined") {
+                        return new Intl.NumberFormat('vi-VN').format(y);
+                    }
+                    return y;
+                }
+            }
+        }
+    };
+    new ApexCharts(document.querySelector("#projectTrendChart"), trendOptions).render();
+
+    // 2. Biểu đồ vật liệu
+    var materialOptions = {
+        series: @json($materialRevenue),
+        chart: {
+            id: 'projectMaterialChart',
+            type: 'pie',
+            height: 300
+        },
+        labels: @json($materialNames),
+        colors: ['#0d6efd', '#20c997', '#ffc107', '#fd7e14', '#dc3545', '#6610f2'],
+        legend: { position: 'bottom' },
+        tooltip: {
+            y: {
+                formatter: function (value) {
+                    return new Intl.NumberFormat('vi-VN').format(value) + " đ";
+                }
+            }
+        }
+    };
+    new ApexCharts(document.querySelector("#projectMaterialChart"), materialOptions).render();
+
+    // Lắng nghe sự kiện đổi theme để cập nhật biểu đồ
+    window.addEventListener('theme-changed', function(e) {
+        const isDark = e.detail.theme === 'dark';
+        const themeConfig = {
+            theme: { mode: isDark ? 'dark' : 'light' }
+        };
+        
+        ApexCharts.exec('projectTrendChart', 'updateOptions', themeConfig);
+        ApexCharts.exec('projectMaterialChart', 'updateOptions', themeConfig);
+    });
+});
+</script>
 <style>
     .hover-card { transition: transform 0.15s, box-shadow 0.15s; }
     .hover-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.12) !important; }

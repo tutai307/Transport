@@ -6,7 +6,7 @@
     <h4><i class="bi bi-plus-circle"></i> Thêm tài xế mới</h4>
 </div>
 
-<form method="POST" action="{{ route('employees.store') }}" style="max-width: 600px;">
+<form method="POST" action="{{ route('employees.store') }}" style="max-width: 600px;" class="needs-validation" novalidate>
     @csrf
 
     @if($errors->any())
@@ -20,6 +20,7 @@
     <div class="mb-3">
         <label for="name" class="form-label">Tên tài xế <span class="text-danger">*</span></label>
         <input type="text" class="form-control" id="name" name="name" value="{{ old('name') }}" required autofocus>
+        <div class="invalid-feedback">Vui lòng nhập tên tài xế.</div>
     </div>
 
     <div class="mb-3">

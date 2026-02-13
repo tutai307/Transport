@@ -6,7 +6,7 @@
     <h4><i class="bi bi-pencil"></i> Sửa tuyến đường</h4>
 </div>
 
-<form method="POST" action="{{ route('routes.update', $route) }}" style="max-width: 600px;">
+<form method="POST" action="{{ route('routes.update', $route) }}" style="max-width: 600px;" class="needs-validation" novalidate>
     @csrf
     @method('PUT')
 
@@ -22,12 +22,14 @@
         <label for="from_location" class="form-label">Điểm đi <span class="text-danger">*</span></label>
         <input type="text" class="form-control" id="from_location" name="from_location"
                value="{{ old('from_location', $route->from_location) }}" required>
+        <div class="invalid-feedback">Vui lòng nhập điểm đi.</div>
     </div>
 
     <div class="mb-3">
         <label for="to_location" class="form-label">Điểm đến <span class="text-danger">*</span></label>
         <input type="text" class="form-control" id="to_location" name="to_location"
                value="{{ old('to_location', $route->to_location) }}" required>
+        <div class="invalid-feedback">Vui lòng nhập điểm đến.</div>
     </div>
 
     <div class="mb-3">

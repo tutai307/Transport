@@ -6,7 +6,7 @@
     <h4><i class="bi bi-pencil"></i> Sửa chuyến xe #{{ $trip->id }}</h4>
 </div>
 
-<form method="POST" action="{{ route('trips.update', $trip) }}" id="tripForm">
+<form method="POST" action="{{ route('trips.update', $trip) }}" id="tripForm" class="needs-validation" novalidate>
     @csrf
     @method('PUT')
 
@@ -26,12 +26,13 @@
                 <label for="trip_date" class="form-label">Ngày <span class="text-danger">*</span></label>
                 <input type="date" class="form-control" id="trip_date" name="trip_date"
                        value="{{ old('trip_date', $trip->trip_date->format('Y-m-d')) }}" required>
+                <div class="invalid-feedback">Vui lòng chọn ngày.</div>
             </div>
         </div>
         <div class="col-md-6">
             <div class="mb-3">
                 <label for="project_id" class="form-label">Dự án <span class="text-danger">*</span></label>
-                <select class="form-select" id="project_id" name="project_id" required>
+                <select class="form-select select2" id="project_id" name="project_id" required data-placeholder="-- Chọn dự án --">
                     <option value="">-- Chọn dự án --</option>
                     @foreach($projects as $project)
                         <option value="{{ $project->id }}" {{ old('project_id', $trip->project_id) == $project->id ? 'selected' : '' }}>
@@ -39,6 +40,7 @@
                         </option>
                     @endforeach
                 </select>
+                <div class="invalid-feedback">Vui lòng chọn dự án.</div>
             </div>
         </div>
     </div>
@@ -47,7 +49,7 @@
         <div class="col-md-6">
             <div class="mb-3">
                 <label for="vehicle_id" class="form-label">Xe <span class="text-danger">*</span></label>
-                <select class="form-select" id="vehicle_id" name="vehicle_id" required>
+                <select class="form-select select2" id="vehicle_id" name="vehicle_id" required data-placeholder="-- Chọn xe --">
                     <option value="">-- Chọn xe --</option>
                     @foreach($vehicles as $vehicle)
                         <option value="{{ $vehicle->id }}" data-volume="{{ $vehicle->default_volume_m3 }}"
@@ -56,12 +58,13 @@
                         </option>
                     @endforeach
                 </select>
+                <div class="invalid-feedback">Vui lòng chọn xe.</div>
             </div>
         </div>
         <div class="col-md-6">
             <div class="mb-3">
                 <label for="driver_id" class="form-label">Tài xế <span class="text-danger">*</span></label>
-                <select class="form-select" id="driver_id" name="driver_id" required>
+                <select class="form-select select2" id="driver_id" name="driver_id" required data-placeholder="-- Chọn tài xế --">
                     <option value="">-- Chọn tài xế --</option>
                     @foreach($employees as $employee)
                         <option value="{{ $employee->id }}" {{ old('driver_id', $trip->driver_id) == $employee->id ? 'selected' : '' }}>
@@ -69,6 +72,7 @@
                         </option>
                     @endforeach
                 </select>
+                <div class="invalid-feedback">Vui lòng chọn tài xế.</div>
             </div>
         </div>
     </div>
@@ -77,20 +81,22 @@
         <div class="col-md-6">
             <div class="mb-3">
                 <label for="material_id" class="form-label">Vật liệu <span class="text-danger">*</span></label>
-                <select class="form-select" id="material_id" name="material_id" required>
+                <select class="form-select select2" id="material_id" name="material_id" required data-placeholder="-- Chọn vật liệu --">
                     <option value="">-- Chọn vật liệu --</option>
                     @foreach($materials as $material)
-                        <option value="{{ $material->id }}" {{ old('material_id', $trip->material_id) == $material->id ? 'selected' : '' }}>
+                        <option value="{{ $material->id }}" data-price="{{ (int)$material->sell_price }}"
+                                {{ old('material_id', $trip->material_id) == $material->id ? 'selected' : '' }}>
                             {{ $material->name }}
                         </option>
                     @endforeach
                 </select>
+                <div class="invalid-feedback">Vui lòng chọn vật liệu.</div>
             </div>
         </div>
         <div class="col-md-6">
             <div class="mb-3">
                 <label for="route_id" class="form-label">Tuyến đường <span class="text-danger">*</span></label>
-                <select class="form-select" id="route_id" name="route_id" required>
+                <select class="form-select select2" id="route_id" name="route_id" required data-placeholder="-- Chọn tuyến --">
                     <option value="">-- Chọn tuyến --</option>
                     @foreach($routes as $route)
                         <option value="{{ $route->id }}" {{ old('route_id', $trip->route_id) == $route->id ? 'selected' : '' }}>
@@ -98,6 +104,7 @@
                         </option>
                     @endforeach
                 </select>
+                <div class="invalid-feedback">Vui lòng chọn tuyến đường.</div>
             </div>
         </div>
     </div>
@@ -107,7 +114,8 @@
             <div class="mb-3">
                 <label for="volume_m3" class="form-label">Khối lượng (m³) <span class="text-danger">*</span></label>
                 <input type="number" step="0.01" class="form-control" id="volume_m3" name="volume_m3"
-                       value="{{ old('volume_m3', $trip->volume_m3) }}" required>
+                       value="{{ old('volume_m3', $trip->volume_m3) }}" required min="0.01">
+                <div class="invalid-feedback">Vui lòng nhập khối lượng (lớn hơn 0).</div>
             </div>
         </div>
         <div class="col-md-4">
@@ -115,6 +123,7 @@
                 <label for="price_per_m3" class="form-label">Đơn giá/m³ <span class="text-danger">*</span></label>
                 <input type="text" class="form-control currency-input" id="price_per_m3" name="price_per_m3"
                        value="{{ old('price_per_m3', number_format($trip->price_per_m3, 0, '', '')) }}" required>
+                <div class="invalid-feedback">Vui lòng nhập đơn giá.</div>
             </div>
         </div>
         <div class="col-md-4">
@@ -144,39 +153,30 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('tripForm');
     const volumeInput = document.getElementById('volume_m3');
     const priceInput = document.getElementById('price_per_m3');
     const totalDisplay = document.getElementById('total_price_display');
+
+    // Bootstrap validation logic
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    }, false);
     const vehicleSelect = document.getElementById('vehicle_id');
     const materialSelect = document.getElementById('material_id');
 
     // Auto-fill volume khi chọn xe
-    vehicleSelect.addEventListener('change', function() {
-        const selected = this.options[this.selectedIndex];
+    $('#vehicle_id').on('select2:select', function(e) {
+        const selected = e.params.data.element;
         if (selected.dataset.volume) {
             volumeInput.value = selected.dataset.volume;
             calculateTotal();
         }
     });
-
-    // Auto-fill giá khi chọn vật liệu (chỉ khi thay đổi, không load khi init edit vì giữ giá cũ)
-    function fetchPrice() {
-        const materialId = materialSelect.value;
-        if (materialId) {
-            fetch(`/api/get-price?material_id=${materialId}`)
-                .then(r => r.json())
-                .then(data => {
-                    if (data.price_per_m3 >= 0) {
-                        priceInput.value = parseInt(data.price_per_m3);
-                        // Format lại giá tiền vừa load
-                        formatCurrency(priceInput);
-                        calculateTotal();
-                    }
-                });
-        }
-    }
-
-    materialSelect.addEventListener('change', fetchPrice);
 
     function calculateTotal() {
         const volume = parseFloat(volumeInput.value) || 0;
@@ -184,6 +184,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const total = volume * price;
         totalDisplay.value = new Intl.NumberFormat('vi-VN').format(total) + ' đ';
     }
+
+    // Auto-fill giá khi chọn vật liệu
+    $('#material_id').on('select2:select', function(e) {
+        const selected = e.params.data.element;
+        if (selected.dataset.price) {
+            priceInput.value = selected.dataset.price;
+            // Format lại giá tiền
+            if (typeof formatCurrency === 'function') {
+                formatCurrency(priceInput);
+            }
+            calculateTotal();
+        }
+    });
 
     volumeInput.addEventListener('input', calculateTotal);
     priceInput.addEventListener('input', calculateTotal);

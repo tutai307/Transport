@@ -6,7 +6,7 @@
     <h4><i class="bi bi-plus-circle"></i> Thêm tuyến đường mới</h4>
 </div>
 
-<form method="POST" action="{{ route('routes.store') }}" style="max-width: 600px;">
+<form method="POST" action="{{ route('routes.store') }}" style="max-width: 600px;" class="needs-validation" novalidate>
     @csrf
 
     @if($errors->any())
@@ -21,12 +21,14 @@
         <label for="from_location" class="form-label">Điểm đi <span class="text-danger">*</span></label>
         <input type="text" class="form-control" id="from_location" name="from_location"
                value="{{ old('from_location') }}" required autofocus placeholder="VD: Mỏ cát Tân An">
+        <div class="invalid-feedback">Vui lòng nhập điểm đi.</div>
     </div>
 
     <div class="mb-3">
         <label for="to_location" class="form-label">Điểm đến <span class="text-danger">*</span></label>
         <input type="text" class="form-control" id="to_location" name="to_location"
                value="{{ old('to_location') }}" required placeholder="VD: Công trình Quận 7">
+        <div class="invalid-feedback">Vui lòng nhập điểm đến.</div>
     </div>
 
     <div class="mb-3">

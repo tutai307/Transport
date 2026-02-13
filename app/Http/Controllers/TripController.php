@@ -8,9 +8,9 @@ use App\Models\Vehicle;
 use App\Models\Employee;
 use App\Models\Material;
 use App\Models\Route;
-use App\Models\RouteMaterial;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class TripController extends Controller
 {
@@ -43,6 +43,37 @@ class TripController extends Controller
             ->orderBy('month', 'desc')
             ->get();
 
+        // 2. Dữ liệu biểu đồ xu hướng tháng cho dự án này
+    $trendStats = Trip::where('project_id', $project->id)
+        ->select(
+            DB::raw("DATE_FORMAT(trip_date, '%Y-%m') as month"),
+            DB::raw("SUM(total_price) as revenue"),
+            DB::raw("SUM(volume_m3) as volume")
+        )
+        ->groupBy('month')
+        ->orderBy('month', 'asc')
+        ->get();
+
+    $chartMonths = [];
+    $chartRevenue = [];
+    $chartVolume = [];
+    foreach ($trendStats as $stat) {
+        $chartMonths[] = Carbon::parse($stat->month . '-01')->format('m/Y');
+        $chartRevenue[] = (int)$stat->revenue;
+        $chartVolume[] = (float)$stat->volume;
+    }
+
+    // 3. Cơ cấu vật liệu trong dự án này
+    $materialStats = Trip::where('project_id', $project->id)
+        ->select('materials.name', DB::raw('SUM(total_price) as total_revenue'))
+        ->join('materials', 'trips.material_id', '=', 'materials.id')
+        ->groupBy('materials.id', 'materials.name')
+        ->orderBy('total_revenue', 'desc')
+        ->get();
+
+    $materialNames = $materialStats->pluck('name');
+    $materialRevenue = $materialStats->pluck('total_revenue')->map(fn($v) => (int)$v);
+
         // Tổng toàn dự án
         $projectSummary = [
             'total_trips' => $months->sum('trip_count'),
@@ -50,7 +81,11 @@ class TripController extends Controller
             'total_price' => $months->sum('total_price'),
         ];
 
-        return view('trips.project', compact('project', 'months', 'projectSummary'));
+        return view('trips.project', compact(
+            'project', 'months', 'projectSummary',
+            'chartMonths', 'chartRevenue', 'chartVolume',
+            'materialNames', 'materialRevenue'
+        ));
     }
 
     // Xem chi tiết chuyến xe trong 1 tháng của 1 dự án
@@ -186,12 +221,4 @@ class TripController extends Controller
         return response()->json(['default_volume_m3' => $vehicle->default_volume_m3]);
     }
 
-    // API endpoint: lấy giá mặc định theo route + material
-    public function getPrice(Request $request)
-    {
-        $material = Material::find($request->material_id);
-        return response()->json([
-            'price_per_m3' => $material ? $material->sell_price : 0,
-        ]);
-    }
 }

@@ -6,18 +6,20 @@ use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\RouteController;
-use App\Http\Controllers\RouteMaterialController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-// Trang chủ redirect đến danh sách chuyến xe
+use App\Http\Controllers\DashboardController;
+
+// Trang chủ redirect đến dashboard
 Route::get('/', function () {
-    return redirect()->route('trips.index');
+    return redirect()->route('dashboard');
 });
 
 // Tất cả route yêu cầu đăng nhập
 Route::middleware('auth')->group(function () {
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Chuyến xe — luồng: Dự án → Tháng → Chi tiết
     Route::get('trips', [TripController::class, 'index'])->name('trips.index');
@@ -36,10 +38,6 @@ Route::middleware('auth')->group(function () {
     Route::resource('materials', MaterialController::class)->except(['show', 'destroy']);
     Route::resource('routes', RouteController::class)->except(['show', 'destroy']);
 
-    // Bảng giá tuyến + vật liệu
-    Route::get('route-materials', [RouteMaterialController::class, 'index'])->name('route-materials.index');
-    Route::post('route-materials', [RouteMaterialController::class, 'store'])->name('route-materials.store');
-    Route::delete('route-materials/{routeMaterial}', [RouteMaterialController::class, 'destroy'])->name('route-materials.destroy');
 
     // Báo cáo
     Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
@@ -47,7 +45,6 @@ Route::middleware('auth')->group(function () {
 
     // API endpoints cho auto-fill (dùng bởi JavaScript)
     Route::get('api/vehicle-volume/{vehicle}', [TripController::class, 'getVehicleVolume'])->name('api.vehicle-volume');
-    Route::get('api/get-price', [TripController::class, 'getPrice'])->name('api.get-price');
 
     // Profile (từ Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

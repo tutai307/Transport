@@ -18,7 +18,7 @@
     </div>
     <div class="col-md-3">
         <label class="form-label">Dự án</label>
-        <select name="project_id" class="form-select">
+        <select name="project_id" class="form-select select2" data-placeholder="-- Tất cả --">
             <option value="">-- Tất cả --</option>
             @foreach($projects as $project)
                 <option value="{{ $project->id }}" {{ request('project_id') == $project->id ? 'selected' : '' }}>
@@ -29,7 +29,7 @@
     </div>
     <div class="col-md-2">
         <label class="form-label">Xe</label>
-        <select name="vehicle_id" class="form-select">
+        <select name="vehicle_id" class="form-select select2" data-placeholder="-- Tất cả --">
             <option value="">-- Tất cả --</option>
             @foreach($vehicles as $vehicle)
                 <option value="{{ $vehicle->id }}" {{ request('vehicle_id') == $vehicle->id ? 'selected' : '' }}>

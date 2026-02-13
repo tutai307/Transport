@@ -6,7 +6,7 @@
     <h4><i class="bi bi-pencil"></i> Sửa tài xế: {{ $employee->name }}</h4>
 </div>
 
-<form method="POST" action="{{ route('employees.update', $employee) }}" style="max-width: 600px;">
+<form method="POST" action="{{ route('employees.update', $employee) }}" style="max-width: 600px;" class="needs-validation" novalidate>
     @csrf
     @method('PUT')
 
@@ -21,6 +21,7 @@
     <div class="mb-3">
         <label for="name" class="form-label">Tên tài xế <span class="text-danger">*</span></label>
         <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $employee->name) }}" required>
+        <div class="invalid-feedback">Vui lòng nhập tên tài xế.</div>
     </div>
 
     <div class="mb-3">

@@ -6,7 +6,7 @@
     <h4><i class="bi bi-pencil"></i> Sửa dự án: {{ $project->name }}</h4>
 </div>
 
-<form method="POST" action="{{ route('projects.update', $project) }}" style="max-width: 600px;">
+<form method="POST" action="{{ route('projects.update', $project) }}" style="max-width: 600px;" class="needs-validation" novalidate>
     @csrf
     @method('PUT')
 
@@ -21,6 +21,7 @@
     <div class="mb-3">
         <label for="name" class="form-label">Tên dự án <span class="text-danger">*</span></label>
         <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $project->name) }}" required>
+        <div class="invalid-feedback">Vui lòng nhập tên dự án.</div>
     </div>
 
     <div class="mb-3">

@@ -6,7 +6,7 @@
     <h4><i class="bi bi-plus-circle"></i> Thêm vật liệu mới</h4>
 </div>
 
-<form method="POST" action="{{ route('materials.store') }}" style="max-width: 600px;">
+<form method="POST" action="{{ route('materials.store') }}" style="max-width: 600px;" class="needs-validation" novalidate>
     @csrf
 
     @if($errors->any())
@@ -23,6 +23,7 @@
                 <label for="name" class="form-label">Tên vật liệu <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" id="name" name="name" value="{{ old('name') }}" required autofocus
                        placeholder="VD: Cát, Đá, Đất...">
+                <div class="invalid-feedback">Vui lòng nhập tên vật liệu.</div>
             </div>
         </div>
         <div class="col-md-6">
@@ -40,6 +41,7 @@
                 <label for="import_price" class="form-label">Đơn giá nhập <span class="text-danger">*</span></label>
                 <input type="text" class="form-control currency-input" id="import_price" name="import_price" 
                        value="{{ old('import_price', 0) }}" required>
+                <div class="invalid-feedback">Vui lòng nhập đơn giá nhập.</div>
             </div>
         </div>
         <div class="col-md-6">
@@ -47,6 +49,7 @@
                 <label for="sell_price" class="form-label">Đơn giá bán <span class="text-danger">*</span></label>
                 <input type="text" class="form-control currency-input" id="sell_price" name="sell_price" 
                        value="{{ old('sell_price', 0) }}" required>
+                <div class="invalid-feedback">Vui lòng nhập đơn giá bán.</div>
             </div>
         </div>
     </div>
