@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
     {
         Schema::disableForeignKeyConstraints();
 
-        $tables = ['users', 'projects', 'trips', 'vehicles', 'employees', 'materials', 'routes', 'route_material'];
+        $tables = ['users', 'projects', 'trips', 'vehicles', 'employees', 'materials', 'routes'];
         foreach ($tables as $table) {
             DB::table($table)->truncate();
         }
