@@ -15,7 +15,7 @@
             <tr>
                 <th>#</th>
                 <th>Biển số</th>
-                <th>Thể tích mặc định (m³)</th>
+                <th>Số khối (m³)</th>
                 <th>Số chuyến</th>
                 <th>Trạng thái</th>
                 <th style="width:80px">Sửa</th>

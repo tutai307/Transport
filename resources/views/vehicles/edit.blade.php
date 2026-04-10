@@ -26,10 +26,10 @@
     </div>
 
     <div class="mb-3">
-        <label for="default_volume_m3" class="form-label">Thể tích mặc định (m³) <span class="text-danger">*</span></label>
+        <label for="default_volume_m3" class="form-label">Số khối (m³) <span class="text-danger">*</span></label>
         <input type="number" step="0.01" class="form-control" id="default_volume_m3" name="default_volume_m3"
                value="{{ old('default_volume_m3', $vehicle->default_volume_m3) }}" required min="0.01">
-        <div class="invalid-feedback">Vui lòng nhập thể tích mặc định (lớn hơn 0).</div>
+        <div class="invalid-feedback">Vui lòng nhập số khối (lớn hơn 0).</div>
     </div>
 
     <div class="mb-3 form-check form-switch">

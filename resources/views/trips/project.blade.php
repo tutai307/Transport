@@ -54,7 +54,7 @@
 <div class="row g-3 mb-4">
     <div class="col-lg-8">
         <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white py-3 border-0">
+            <div class="card-header py-3 border-0">
                 <h6 class="mb-0 fw-bold"><i class="bi bi-graph-up text-primary"></i> Xu hướng doanh thu & Khối lượng</h6>
             </div>
             <div class="card-body">
@@ -64,7 +64,7 @@
     </div>
     <div class="col-lg-4">
         <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white py-3 border-0">
+            <div class="card-header py-3 border-0">
                 <h6 class="mb-0 fw-bold"><i class="bi bi-pie-chart text-success"></i> Cơ cấu vật liệu</h6>
             </div>
             <div class="card-body">

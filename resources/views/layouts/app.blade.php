@@ -27,24 +27,73 @@
         }
 
         [data-bs-theme="dark"] {
-            --body-bg: #1a1d21;
-            --sidebar-bg: #212529;
-            --text-color: #e9ecef;
-            --card-bg: #2c3035;
-            --border-color: #495057;
-            --nav-bg: #000;
-            --sidebar-text: #adb5bd;
+            --body-bg: #121416;
+            --sidebar-bg: #1a1d21;
+            --text-color: #f8f9fa;
+            --card-bg: #1e2125;
+            --border-color: #373b3e;
+            --nav-bg: #000000;
+            --sidebar-text: #dee2e6;
             --sidebar-hover-bg: #0d6efd;
-            --sidebar-hover-text: #fff;
+            --sidebar-hover-text: #ffffff;
         }
 
         /* Override Bootstrap for Dark Mode visibility */
-        [data-bs-theme="dark"] .table-primary { --bs-table-bg: #212529; --bs-table-color: #fff; --bs-table-border-color: var(--border-color); }
+        [data-bs-theme="dark"] .table-primary { 
+            --bs-table-bg: #1a1d21; 
+            --bs-table-color: #ffffff; 
+            --bs-table-border-color: #373b3e; 
+            --bs-table-striped-bg: #212529;
+        }
         [data-bs-theme="dark"] .table-secondary { --bs-table-bg: #2c3035; --bs-table-color: #adb5bd; }
-        [data-bs-theme="dark"] .text-success { color: #2ecc71 !important; } /* Sáng hơn trên nền tối */
-        [data-bs-theme="dark"] .text-muted { color: #adb5bd !important; }
+        [data-bs-theme="dark"] .table-warning { --bs-table-bg: #332b00; --bs-table-color: #ffecb5; --bs-table-border-color: #4d4400; }
+        [data-bs-theme="dark"] .table-info { --bs-table-bg: #002b33; --bs-table-color: #b5f2ff; }
+        
+        [data-bs-theme="dark"] .bg-light { background-color: #212529 !important; color: #f8f9fa !important; }
+        [data-bs-theme="dark"] .bg-primary-subtle { background-color: rgba(13, 110, 253, 0.1) !important; color: #0d6efd !important; }
+        [data-bs-theme="dark"] .bg-success-subtle { background-color: rgba(25, 135, 84, 0.1) !important; color: #198754 !important; }
+        
+        [data-bs-theme="dark"] .text-success { color: #4ade80 !important; } /* Sáng hơn (Emerald 400) */
+        [data-bs-theme="dark"] .text-danger { color: #f87171 !important; } /* Sáng hơn (Red 400) */
+        [data-bs-theme="dark"] .text-warning { color: #fbbf24 !important; } /* Sáng hơn (Amber 400) */
+        [data-bs-theme="dark"] .text-info { color: #38bdf8 !important; } /* Sáng hơn (Sky 400) */
+        [data-bs-theme="dark"] .text-muted { color: #9ca3af !important; }
         [data-bs-theme="dark"] .breadcrumb-item.active { color: #adb5bd; }
-        [data-bs-theme="dark"] .card-header { background-color: rgba(255,255,255,0.05); }
+        [data-bs-theme="dark"] .card-header { background-color: rgba(255,255,255,0.03); }
+        
+        /* Select2 Dark Mode Fixes */
+        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection {
+            background-color: var(--card-bg);
+            border-color: var(--border-color);
+            color: var(--text-color);
+        }
+        [data-bs-theme="dark"] .select2-dropdown {
+            background-color: var(--card-bg);
+            border-color: var(--border-color);
+        }
+        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-results__option--highlighted[aria-selected] {
+            background-color: var(--sidebar-hover-bg);
+        }
+        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+            color: var(--text-color);
+        }
+        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-search__field {
+            background-color: var(--body-bg);
+            color: var(--text-color);
+            border-color: var(--border-color);
+        }
+
+        /* Flatpickr Dark Mode Fixes */
+        [data-bs-theme="dark"] .flatpickr-calendar {
+            background: var(--card-bg);
+            border-color: var(--border-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+        [data-bs-theme="dark"] .flatpickr-day { color: var(--text-color); }
+        [data-bs-theme="dark"] .flatpickr-day:hover { background: var(--sidebar-hover-bg); }
+        [data-bs-theme="dark"] .flatpickr-current-month, [data-bs-theme="dark"] .flatpickr-weekday { color: var(--text-color); fill: var(--text-color); }
+        [data-bs-theme="dark"] .flatpickr-day.today { border-color: var(--sidebar-hover-bg); }
+        [data-bs-theme="dark"] .flatpickr-day.selected { background: var(--sidebar-hover-bg); border-color: var(--sidebar-hover-bg); }
 
         /* === UX tối ưu cho người dùng lớn tuổi === */
         body { font-size: 16px; background: var(--body-bg); color: var(--text-color); transition: background 0.3s, color 0.3s; }
@@ -69,7 +118,6 @@
             padding: 8px 20px;
             border-radius: 6px;
         }
-        .btn-lg { min-height: 50px; font-size: 17px; }
 
         /* Bảng dễ đọc */
         .table { font-size: 15px; color: var(--text-color); }
@@ -159,6 +207,13 @@
         }
     </style>
     @stack('styles')
+    <script>
+        // --- Dark Mode Early Init (Prevent FOUC) ---
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-bs-theme', savedTheme);
+        })();
+    </script>
 </head>
 <body>
     {{-- Navbar --}}
@@ -262,10 +317,9 @@
         const themeIcon = document.getElementById('theme-icon');
         const html = document.documentElement;
 
-        // Tải theme từ localStorage
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        html.setAttribute('data-bs-theme', savedTheme);
-        updateIcon(savedTheme);
+        // Tải theme từ localStorage (Cập nhật UI bổ trợ)
+        const currentTheme = html.getAttribute('data-bs-theme');
+        updateIcon(currentTheme);
 
         themeToggle.addEventListener('click', () => {
             const currentTheme = html.getAttribute('data-bs-theme');

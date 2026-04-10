@@ -60,7 +60,7 @@
     {{-- Biểu đồ xu hướng --}}
     <div class="col-lg-8">
         <div class="card border-0 shadow-sm h-100">
-            <div class="card-header bg-white py-3 border-0">
+            <div class="card-header py-3 border-0">
                 <h6 class="mb-0 fw-bold">Doanh thu & Lợi nhuận (6 tháng gần nhất)</h6>
             </div>
             <div class="card-body">
@@ -72,7 +72,7 @@
     {{-- Biểu đồ cơ cấu dự án --}}
     <div class="col-lg-4">
         <div class="card border-0 shadow-sm h-100">
-            <div class="card-header bg-white py-3 border-0">
+            <div class="card-header py-3 border-0">
                 <h6 class="mb-0 fw-bold">Tỷ trọng doanh thu theo Dự án</h6>
             </div>
             <div class="card-body">
