@@ -196,8 +196,37 @@
                 padding: 4px 8px;
             }
             .mobile-bottom-nav a.active { color: #0d6efd; }
-            .mobile-bottom-nav a i { font-size: 20px; display: block; }
-            .content-area { padding-bottom: 70px !important; }
+            .mobile-bottom-nav a i { font-size: 24px; display: block; margin-bottom: 2px; }
+            .content-area { padding-bottom: 85px !important; }
+
+            /* FAB - Floating Action Button */
+            .fab {
+                position: fixed;
+                bottom: 85px;
+                right: 20px;
+                width: 60px;
+                height: 60px;
+                background-color: #198754;
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 30px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 1001;
+                text-decoration: none;
+                transition: transform 0.2s;
+            }
+            .fab:active { transform: scale(0.9); }
+        }
+
+        /* Tối ưu tap targets (ngón tay dễ bấm) */
+        @media (max-width: 991px) {
+            .form-control, .form-select, .btn, .select2-container--bootstrap-5 .select2-selection {
+                font-size: 17px !important;
+            }
+            .nav-link { padding: 14px 18px !important; }
         }
         /* Select2 Bootstrap 5 UX fixes */
         .select2-container--bootstrap-5 .select2-selection {
@@ -319,16 +348,18 @@
         <a href="{{ route('trips.index') }}" class="{{ request()->routeIs('trips.*') ? 'active' : '' }}">
             <i class="bi bi-card-list"></i> Chuyến xe
         </a>
-        <a href="{{ route('trips.create') }}" class="text-success">
-            <i class="bi bi-plus-circle-fill"></i> Thêm
-        </a>
+        {{-- Nút Thêm gỡ bỏ theo yêu cầu người dùng --}}
         <a href="{{ route('reports.index') }}" class="{{ request()->routeIs('reports.*') ? 'active' : '' }}">
             <i class="bi bi-file-earmark-spreadsheet"></i> Báo cáo
         </a>
-        <a href="{{ route('projects.index') }}" class="{{ request()->routeIs('projects.*', 'vehicles.*', 'employees.*', 'materials.*', 'routes.*') ? 'active' : '' }}">
-            <i class="bi bi-gear"></i> Danh mục
+        <a href="{{ route('settings.index') }}" class="{{ request()->routeIs('settings.index', 'projects.*', 'vehicles.*', 'employees.*', 'materials.*', 'routes.*') ? 'active' : '' }}">
+            <i class="bi bi-grid"></i>
+            <span>Danh mục</span>
         </a>
     </div>
+
+    {{-- Floating Action Button (Mobile Only) --}}
+    {{-- FAB gỡ bỏ theo yêu cầu người dùng --}}
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

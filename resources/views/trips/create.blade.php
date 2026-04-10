@@ -158,7 +158,7 @@
         <textarea class="form-control" id="note" name="note" rows="2">{{ old('note') }}</textarea>
     </div>
 
-    <div class="d-flex gap-2">
+    <div class="d-flex gap-2 mb-5">
         <button type="submit" class="btn btn-primary btn-lg">
             <i class="bi bi-check-circle"></i> Lưu
         </button>
@@ -173,7 +173,7 @@
 
 <hr class="my-5">
 
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-3">
     <h5 class="mb-0 text-primary" id="recent-trips-title"><i class="bi bi-calendar-event"></i> Các chuyến xe đã nhập (Tháng {{ $filterMonth }}/{{ $filterYear }})</h5>
     <div class="d-flex align-items-center gap-2">
         <label class="text-muted small mb-0">Xem tháng khác:</label>
@@ -190,7 +190,7 @@
     </div>
 </div>
 
-<div class="table-responsive">
+<div class="table-responsive d-none d-md-block">
     <table class="table table-bordered table-sm table-hover align-middle shadow-sm">
         <thead class="table-primary">
             <tr>
@@ -207,6 +207,11 @@
             @include('trips.partials.recent_trips_rows', ['recentTrips' => $recentTrips])
         </tbody>
     </table>
+</div>
+
+{{-- Mobile View (Cards) --}}
+<div id="recent-trips-mobile" class="d-block d-md-none">
+    @include('trips.partials.recent_trips_cards', ['recentTrips' => $recentTrips])
 </div>
 
 @push('scripts')
@@ -281,6 +286,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Show loading state
         tableBody.style.opacity = '0.5';
+        const mobileContainer = document.getElementById('recent-trips-mobile');
+        if (mobileContainer) mobileContainer.style.opacity = '0.5';
         
         let url = `{{ route('trips.create') }}?filter_month=${month}&filter_year=${year}`;
         if (projectId) {
@@ -292,10 +299,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 'X-Requested-With': 'XMLHttpRequest'
             }
         })
-        .then(response => response.text())
-        .then(html => {
-            tableBody.innerHTML = html;
+        .then(response => response.json())
+        .then(data => {
+            tableBody.innerHTML = data.html;
+            if (mobileContainer) mobileContainer.innerHTML = data.cards;
+            
             tableBody.style.opacity = '1';
+            if (mobileContainer) mobileContainer.style.opacity = '1';
             
             // Get project name
             const projectName = projectId ? projectSelect.options[projectSelect.selectedIndex].text : 'Tất cả dự án';

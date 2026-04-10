@@ -2,11 +2,17 @@
 @section('title', 'Chuyến xe theo dự án')
 
 @section('content')
-<div class="page-header d-flex justify-content-between align-items-center">
-    <h4 class="mb-0"><i class="bi bi-card-list"></i> Chuyến xe theo dự án</h4>
-    <a href="{{ route('trips.create') }}" class="btn btn-primary btn-lg">
-        <i class="bi bi-plus-circle"></i> Thêm chuyến
-    </a>
+<div class="page-header mb-4">
+    <div class="row align-items-center g-3">
+        <div class="col">
+            <h4 class="mb-0"><i class="bi bi-card-list"></i> Chuyến xe theo dự án</h4>
+        </div>
+        <div class="col-auto">
+            <a href="{{ route('trips.create') }}" class="btn btn-primary d-none d-md-flex align-items-center">
+                <i class="bi bi-plus-circle me-2"></i> Thêm chuyến
+            </a>
+        </div>
+    </div>
 </div>
 
 <div class="row">
@@ -16,8 +22,8 @@
             <a href="{{ route('trips.by-project', $project) }}" class="text-decoration-none">
                 <div class="card h-100 {{ $project->is_active ? 'border-primary' : 'border-secondary' }} shadow-sm hover-card">
                     <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h5 class="card-title mb-0 {{ $project->is_active ? 'text-primary' : 'text-secondary' }}">
+                        <div class="mb-2">
+                            <h5 class="card-title mb-1 {{ $project->is_active ? 'text-primary' : 'text-secondary' }} text-break">
                                 <i class="bi bi-building"></i> {{ $project->name }}
                             </h5>
                             @if(!$project->is_active)

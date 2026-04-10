@@ -2,9 +2,15 @@
 @section('title', 'Trang chủ')
 
 @section('content')
-<div class="page-header d-flex justify-content-between align-items-center">
-    <h4><i class="bi bi-speedometer2"></i> Tổng quan hệ thống</h4>
-    <div class="text-muted small">Cập nhật: {{ now()->format('d/m/Y H:i') }}</div>
+<div class="page-header mb-4">
+    <div class="row align-items-center g-2">
+        <div class="col">
+            <h4 class="mb-0 fw-bold text-primary"><i class="bi bi-speedometer2"></i> Tổng quan hệ thống</h4>
+        </div>
+        <div class="col-auto">
+            <div class="text-muted small"><i class="bi bi-clock"></i> {{ now()->format('H:i d/m/y') }}</div>
+        </div>
+    </div>
 </div>
 
 {{-- Chỉ số tổng quan --}}

@@ -9,42 +9,46 @@
             <li class="breadcrumb-item active">{{ $project->name }}</li>
         </ol>
     </nav>
-    <div class="d-flex justify-content-between align-items-center">
-        <h4 class="mb-0"><i class="bi bi-building"></i> {{ $project->name }}</h4>
-        <div class="d-flex gap-2">
-            <a href="{{ route('reports.export', ['project_id' => $project->id]) }}" class="btn btn-success">
-                <i class="bi bi-file-earmark-excel"></i> Xuất Excel toàn bộ
-            </a>
-            <a href="{{ route('trips.create', ['project_id' => $project->id]) }}" class="btn btn-primary btn-lg">
-                <i class="bi bi-plus-circle"></i> Thêm chuyến
-            </a>
+    <div class="row g-3 align-items-center">
+        <div class="col-12 col-md">
+            <h4 class="mb-0 text-break"><i class="bi bi-building"></i> {{ $project->name }}</h4>
+        </div>
+        <div class="col-12 col-md-auto">
+            <div class="d-flex gap-2">
+                <a href="{{ route('reports.export', ['project_id' => $project->id]) }}" class="btn btn-success btn-sm flex-fill flex-md-grow-0">
+                    <i class="bi bi-file-earmark-excel"></i> Xuất Excel
+                </a>
+                <a href="{{ route('trips.create', ['project_id' => $project->id]) }}" class="btn btn-primary btn-sm flex-fill flex-md-grow-0">
+                    <i class="bi bi-plus-circle"></i> Thêm chuyến
+                </a>
+            </div>
         </div>
     </div>
 </div>
 
 {{-- Tổng kết dự án --}}
-<div class="row mb-4">
-    <div class="col-md-4">
-        <div class="card border-primary">
-            <div class="card-body text-center py-2">
-                <small class="text-muted">Tổng số chuyến</small>
-                <h4 class="text-primary mb-0">{{ number_format($projectSummary['total_trips']) }}</h4>
+<div class="row g-2 mb-4">
+    <div class="col-4 col-md-4">
+        <div class="card border-primary h-100">
+            <div class="card-body text-center p-2">
+                <small class="text-muted d-block small">Số chuyến</small>
+                <h5 class="text-primary mb-0 fw-bold">{{ number_format($projectSummary['total_trips']) }}</h5>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card border-info">
-            <div class="card-body text-center py-2">
-                <small class="text-muted">Tổng khối lượng</small>
-                <h4 class="text-info mb-0">{{ number_format($projectSummary['total_volume'], 2) }} m³</h4>
+    <div class="col-4 col-md-4">
+        <div class="card border-info h-100">
+            <div class="card-body text-center p-2">
+                <small class="text-muted d-block small">Khối lượng</small>
+                <h5 class="text-info mb-0 fw-bold">{{ number_format($projectSummary['total_volume'], 1) }}</h5>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card border-success">
-            <div class="card-body text-center py-2">
-                <small class="text-muted">Tổng tiền</small>
-                <h4 class="text-success mb-0">{{ number_format($projectSummary['total_price'], 0, ',', '.') }} đ</h4>
+    <div class="col-4 col-md-4">
+        <div class="card border-success h-100">
+            <div class="card-body text-center p-2">
+                <small class="text-muted d-block small">Tiền (M)</small>
+                <h5 class="text-success mb-0 fw-bold">{{ number_format($projectSummary['total_price'] / 1000000, 1) }}</h5>
             </div>
         </div>
     </div>
@@ -75,12 +79,12 @@
 </div>
 
 {{-- Danh sách tháng --}}
-<div class="row">
+<div class="row g-3">
     @forelse($months as $m)
-        <div class="col-md-6 col-lg-4 mb-3">
+        <div class="col-12 col-md-6 col-lg-4">
             <a href="{{ route('trips.by-month', ['project' => $project->id, 'year' => $m->year, 'month' => $m->month]) }}"
                class="text-decoration-none">
-                <div class="card shadow-sm hover-card">
+                <div class="card shadow-sm hover-card h-100">
                     <div class="card-body">
                         <h5 class="card-title text-primary mb-3">
                             <i class="bi bi-calendar-month"></i>

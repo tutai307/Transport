@@ -137,7 +137,10 @@ class TripController extends Controller
             ->get();
 
         if ($request->ajax()) {
-            return view('trips.partials.recent_trips_rows', compact('recentTrips'))->render();
+            return response()->json([
+                'html' => view('trips.partials.recent_trips_rows', compact('recentTrips'))->render(),
+                'cards' => view('trips.partials.recent_trips_cards', compact('recentTrips'))->render(),
+            ]);
         }
 
         return view('trips.create', compact(

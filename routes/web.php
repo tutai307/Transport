@@ -11,6 +11,10 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\SettingsController;
+
+// Settings Hub
+Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
 
 // Trang chủ redirect đến dashboard
 Route::get('/', function () {
