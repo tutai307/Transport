@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <title>{{ config('app.name') }} - @yield('title', 'Trang chủ')</title>
+    <!-- Preconnect to CDNs for faster loading -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://code.jquery.com">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <!-- Select2 & Flatpickr -->
@@ -252,22 +258,38 @@
                 <a class="nav-link {{ request()->routeIs('projects.*') ? 'active' : '' }}" href="{{ route('projects.index') }}">
                     <i class="bi bi-building"></i> Dự án
                 </a>
-                <a class="nav-link {{ request()->routeIs('vehicles.*') ? 'active' : '' }}" href="{{ route('vehicles.index') }}">
-                    <i class="bi bi-truck-front"></i> Xe
-                </a>
-                <a class="nav-link {{ request()->routeIs('employees.*') ? 'active' : '' }}" href="{{ route('employees.index') }}">
-                    <i class="bi bi-people"></i> Tài xế
-                </a>
-                <a class="nav-link {{ request()->routeIs('materials.*') ? 'active' : '' }}" href="{{ route('materials.index') }}">
-                    <i class="bi bi-box-seam"></i> Vật liệu
-                </a>
-                <a class="nav-link {{ request()->routeIs('routes.*') ? 'active' : '' }}" href="{{ route('routes.index') }}">
-                    <i class="bi bi-signpost-2"></i> Tuyến đường
-                </a>
-                <hr class="mx-3">
                 <a class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" href="{{ route('reports.index') }}">
                     <i class="bi bi-file-earmark-spreadsheet"></i> Báo cáo
                 </a>
+
+                <hr class="mx-3 my-2">
+                <div class="px-3 mb-2 small text-uppercase text-muted fw-bold" style="font-size: 11px; letter-spacing: 1px;">Hệ thống</div>
+                
+                <a class="nav-link {{ request()->routeIs('vehicles.*', 'employees.*', 'materials.*', 'routes.*') ? 'active' : '' }}" 
+                   data-bs-toggle="collapse" href="#categoryMenu" role="button" aria-expanded="false">
+                    <i class="bi bi-gear"></i> Danh mục <i class="bi bi-chevron-down small ms-auto"></i>
+                </a>
+                <div class="collapse {{ request()->routeIs('vehicles.*', 'employees.*', 'materials.*', 'routes.*') ? 'show' : '' }} ms-3" id="categoryMenu">
+                    <a class="nav-link {{ request()->routeIs('vehicles.*') ? 'active' : '' }}" href="{{ route('vehicles.index') }}">
+                        <i class="bi bi-truck-front"></i> Xe
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('employees.*') ? 'active' : '' }}" href="{{ route('employees.index') }}">
+                        <i class="bi bi-people"></i> Tài xế
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('materials.*') ? 'active' : '' }}" href="{{ route('materials.index') }}">
+                        <i class="bi bi-box-seam"></i> Vật liệu
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('routes.*') ? 'active' : '' }}" href="{{ route('routes.index') }}">
+                        <i class="bi bi-signpost-2"></i> Tuyến đường
+                    </a>
+                </div>
+                <div class="mt-auto px-3 py-4 text-center">
+                    <hr class="mx-0 mb-3 opacity-25">
+                    <div class="small text-muted opacity-75" style="font-size: 11px; line-height: 1.4;">
+                        <i class="bi bi-heart-fill text-danger"></i> Sản phẩm được tài trợ bởi <br>
+                        <strong class="text-primary">Nguyễn Ngọc Tú Tài</strong>
+                    </div>
+                </div>
             </nav>
         </div>
 
@@ -310,7 +332,7 @@
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js" defer></script>
     <script>
         // --- Dark Mode Logic ---
         const themeToggle = document.getElementById('theme-toggle');
@@ -401,8 +423,8 @@
     </script>
     
     <!-- Flatpickr JS -->
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vn.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vn.js" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize all date pickers with Vietnamese locale

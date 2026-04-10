@@ -110,7 +110,7 @@ class TripController extends Controller
         return view('trips.month', compact('project', 'trips', 'summary', 'year', 'month', 'monthLabel'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $projects = Project::active()->orderBy('name')->get();
         $vehicles = Vehicle::active()->orderBy('plate_number')->get();
@@ -118,7 +118,32 @@ class TripController extends Controller
         $materials = Material::active()->orderBy('name')->get();
         $routes = Route::active()->get();
 
-        return view('trips.create', compact('projects', 'vehicles', 'employees', 'materials', 'routes'));
+        // --- Fetch recent trips for the table below ---
+        $filterMonth = $request->get('filter_month', date('n'));
+        $filterYear = $request->get('filter_year', date('Y'));
+        $projectId = $request->get('project_id');
+
+        $query = Trip::with(['project', 'vehicle', 'driver', 'material', 'route'])
+            ->whereYear('trip_date', $filterYear)
+            ->whereMonth('trip_date', $filterMonth);
+
+        if ($projectId) {
+            $query->where('project_id', $projectId);
+        }
+
+        $recentTrips = $query->orderBy('trip_date', 'desc')
+            ->orderBy('id', 'desc')
+            ->limit(50)
+            ->get();
+
+        if ($request->ajax()) {
+            return view('trips.partials.recent_trips_rows', compact('recentTrips'))->render();
+        }
+
+        return view('trips.create', compact(
+            'projects', 'vehicles', 'employees', 'materials', 'routes',
+            'recentTrips', 'filterMonth', 'filterYear'
+        ));
     }
 
     public function store(Request $request)

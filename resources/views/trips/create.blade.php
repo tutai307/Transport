@@ -2,8 +2,13 @@
 @section('title', 'Thêm chuyến xe')
 
 @section('content')
+@php
+    $selectedProject = $projects->where('id', request('project_id'))->first();
+    $pageTitle = $selectedProject ? 'Thêm chuyến xe: ' . $selectedProject->name : 'Thêm chuyến xe mới';
+@endphp
+
 <div class="page-header">
-    <h4><i class="bi bi-plus-circle"></i> Thêm chuyến xe mới</h4>
+    <h4 id="page-main-title"><i class="bi bi-plus-circle"></i> {{ $pageTitle }}</h4>
 </div>
 
 <form method="POST" action="{{ route('trips.store') }}" id="tripForm" class="needs-validation" novalidate>
@@ -20,28 +25,40 @@
     @endif
 
     <div class="row">
-        <div class="col-md-6">
-            <div class="mb-3">
-                <label for="trip_date" class="form-label">Ngày <span class="text-danger">*</span></label>
-                <input type="date" class="form-control" id="trip_date" name="trip_date"
-                       value="{{ old('trip_date', request('trip_date', date('Y-m-d'))) }}" required>
-                <div class="invalid-feedback">Vui lòng chọn ngày.</div>
+        @if(request('project_id'))
+            <div class="col-md-12">
+                <div class="mb-3">
+                    <label for="trip_date" class="form-label">Ngày <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="trip_date" name="trip_date"
+                           value="{{ old('trip_date', request('trip_date', date('Y-m-d'))) }}" required>
+                    <div class="invalid-feedback">Vui lòng chọn ngày.</div>
+                </div>
+                <input type="hidden" name="project_id" id="project_id_select" value="{{ request('project_id') }}">
             </div>
-        </div>
-        <div class="col-md-6">
-            <div class="mb-3">
-                <label for="project_id" class="form-label">Dự án <span class="text-danger">*</span></label>
-                <select class="form-select select2" id="project_id" name="project_id" required data-placeholder="-- Chọn dự án --">
-                    <option value="">-- Chọn dự án --</option>
-                    @foreach($projects as $project)
-                        <option value="{{ $project->id }}" {{ old('project_id', request('project_id')) == $project->id ? 'selected' : '' }}>
-                            {{ $project->name }}
-                        </option>
-                    @endforeach
-                </select>
-                <div class="invalid-feedback">Vui lòng chọn dự án.</div>
+        @else
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="trip_date" class="form-label">Ngày <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="trip_date" name="trip_date"
+                           value="{{ old('trip_date', request('trip_date', date('Y-m-d'))) }}" required>
+                    <div class="invalid-feedback">Vui lòng chọn ngày.</div>
+                </div>
             </div>
-        </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="project_id" class="form-label">Dự án <span class="text-danger">*</span></label>
+                    <select class="form-select select2" id="project_id_select" name="project_id" required data-placeholder="-- Chọn dự án --">
+                        <option value="">-- Chọn dự án --</option>
+                        @foreach($projects as $project)
+                            <option value="{{ $project->id }}" {{ old('project_id') == $project->id ? 'selected' : '' }}>
+                                {{ $project->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <div class="invalid-feedback">Vui lòng chọn dự án.</div>
+                </div>
+            </div>
+        @endif
     </div>
 
     <div class="row">
@@ -154,6 +171,44 @@
     </div>
 </form>
 
+<hr class="my-5">
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0 text-primary" id="recent-trips-title"><i class="bi bi-calendar-event"></i> Các chuyến xe đã nhập (Tháng {{ $filterMonth }}/{{ $filterYear }})</h5>
+    <div class="d-flex align-items-center gap-2">
+        <label class="text-muted small mb-0">Xem tháng khác:</label>
+        <select id="filter_month" class="form-select form-select-sm w-auto">
+            @for($m = 1; $m <= 12; $m++)
+                <option value="{{ $m }}" {{ $filterMonth == $m ? 'selected' : '' }}>Tháng {{ $m }}</option>
+            @endfor
+        </select>
+        <select id="filter_year" class="form-select form-select-sm w-auto">
+            @for($y = date('Y') - 2; $y <= date('Y') + 1; $y++)
+                <option value="{{ $y }}" {{ $filterYear == $y ? 'selected' : '' }}>Năm {{ $y }}</option>
+            @endfor
+        </select>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-sm table-hover align-middle shadow-sm">
+        <thead class="table-primary">
+            <tr>
+                <th>Ngày</th>
+                <th>Xe</th>
+                <th>Tài xế</th>
+                <th>Vật liệu</th>
+                <th class="text-end">KL (m³)</th>
+                <th class="text-end">Thành tiền</th>
+                <th>Ghi chú</th>
+            </tr>
+        </thead>
+        <tbody id="recent-trips-body">
+            @include('trips.partials.recent_trips_rows', ['recentTrips' => $recentTrips])
+        </tbody>
+    </table>
+</div>
+
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -210,6 +265,60 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initial calculation
     calculateTotal();
+
+    // --- AJAX Filter logic ---
+    const monthSelect = document.getElementById('filter_month');
+    const yearSelect = document.getElementById('filter_year');
+    const projectSelect = document.getElementById('project_id_select');
+    const tableBody = document.getElementById('recent-trips-body');
+    const tableTitle = document.getElementById('recent-trips-title');
+    const pageMainTitle = document.getElementById('page-main-title');
+
+    function updateRecentTrips() {
+        const month = monthSelect.value;
+        const year = yearSelect.value;
+        const projectId = projectSelect.value; 
+        
+        // Show loading state
+        tableBody.style.opacity = '0.5';
+        
+        let url = `{{ route('trips.create') }}?filter_month=${month}&filter_year=${year}`;
+        if (projectId) {
+            url += `&project_id=${projectId}`;
+        }
+        
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            tableBody.innerHTML = html;
+            tableBody.style.opacity = '1';
+            
+            // Get project name
+            const projectName = projectId ? projectSelect.options[projectSelect.selectedIndex].text : 'Tất cả dự án';
+            tableTitle.innerHTML = `<i class="bi bi-calendar-event"></i> Chuyến xe - ${projectName} (Tháng ${month}/${year})`;
+            
+            // Update page main title
+            if (projectId) {
+                pageMainTitle.innerHTML = `<i class="bi bi-plus-circle"></i> Thêm chuyến xe: ${projectName}`;
+            } else {
+                pageMainTitle.innerHTML = `<i class="bi bi-plus-circle"></i> Thêm chuyến xe mới`;
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching trips:', error);
+            tableBody.style.opacity = '1';
+        });
+    }
+
+    monthSelect.addEventListener('change', updateRecentTrips);
+    yearSelect.addEventListener('change', updateRecentTrips);
+    
+    // Listen for project change (using jQuery for Select2 compatibility)
+    $('#project_id_select').on('change', updateRecentTrips);
 });
 </script>
 @endpush
