@@ -47,7 +47,7 @@
     <div class="col-4 col-md-4">
         <div class="card border-success h-100">
             <div class="card-body text-center p-2">
-                <small class="text-muted d-block small">Tiền (M)</small>
+                <small class="text-muted d-block small">Tiền (triệu)</small>
                 <h5 class="text-success mb-0 fw-bold">{{ number_format($projectSummary['total_price'] / 1000000, 1) }}</h5>
             </div>
         </div>
