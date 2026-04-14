@@ -36,17 +36,13 @@
                         @endif
 
                         <div class="row text-center mt-3">
-                            <div class="col-4">
+                            <div class="col-6">
                                 <div class="text-muted small">Số chuyến</div>
-                                <div class="fw-bold fs-5">{{ number_format($project->trips_count) }}</div>
+                                <div class="fw-bold fs-5 text-primary">{{ ($project->total_trips_count ?? 0) + 0 }}</div>
                             </div>
-                            <div class="col-4">
-                                <div class="text-muted small">Khối lượng</div>
-                                <div class="fw-bold fs-6">{{ number_format($project->trips_sum_volume_m3 ?? 0, 1) }} m³</div>
-                            </div>
-                            <div class="col-4">
+                            <div class="col-6">
                                 <div class="text-muted small">Tổng tiền</div>
-                                <div class="fw-bold fs-6 text-success">{{ number_format($project->trips_sum_total_price ?? 0, 0, ',', '.') }}đ</div>
+                                <div class="fw-bold fs-5 text-success">{{ number_format($project->trips_sum_total_price ?? 0, 0, ',', '.') }}đ</div>
                             </div>
                         </div>
                     </div>

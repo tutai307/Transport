@@ -25,13 +25,6 @@
         <div class="invalid-feedback">Vui lòng nhập biển số xe.</div>
     </div>
 
-    <div class="mb-3">
-        <label for="default_volume_m3" class="form-label">Số khối (m³) <span class="text-danger">*</span></label>
-        <input type="number" step="0.01" class="form-control" id="default_volume_m3" name="default_volume_m3"
-               value="{{ old('default_volume_m3', $vehicle->default_volume_m3) }}" required min="0.01">
-        <div class="invalid-feedback">Vui lòng nhập số khối (lớn hơn 0).</div>
-    </div>
-
     <div class="mb-3 form-check form-switch">
         <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1"
                {{ old('is_active', $vehicle->is_active) ? 'checked' : '' }}>

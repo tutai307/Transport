@@ -12,10 +12,12 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 class TripsExport implements FromView, WithTitle, ShouldAutoSize
 {
     protected array $filters;
+    protected string $exportType;
 
     public function __construct(array $filters)
     {
         $this->filters = $filters;
+        $this->exportType = $filters['export_type'] ?? 'freight';
     }
 
     public function view(): View
@@ -46,7 +48,8 @@ class TripsExport implements FromView, WithTitle, ShouldAutoSize
 
         return view('exports.trips', [
             'trips' => $trips,
-            'filters' => $this->filters
+            'filters' => $this->filters,
+            'exportType' => $this->exportType
         ]);
     }
 

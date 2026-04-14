@@ -17,9 +17,12 @@ class TripController extends Controller
     // Trang chính: danh sách dự án có chuyến xe
     public function index()
     {
-        $projects = Project::withCount('trips')
+        $projects = Project::select('projects.*')
+            ->leftJoin('trips', 'projects.id', '=', 'trips.project_id')
+            ->selectRaw("SUM(trips.quantity) as total_trips_count")
+            ->selectRaw("COUNT(trips.id) as record_count")
             ->withSum('trips', 'total_price')
-            ->withSum('trips', 'volume_m3')
+            ->groupBy('projects.id')
             ->orderBy('is_active', 'desc')
             ->orderBy('name')
             ->get();
@@ -34,8 +37,7 @@ class TripController extends Controller
             ->select(
                 DB::raw('YEAR(trip_date) as year'),
                 DB::raw('MONTH(trip_date) as month'),
-                DB::raw('COUNT(*) as trip_count'),
-                DB::raw('SUM(volume_m3) as total_volume'),
+                DB::raw("SUM(quantity) as trip_count"),
                 DB::raw('SUM(total_price) as total_price')
             )
             ->groupBy('year', 'month')
@@ -43,48 +45,32 @@ class TripController extends Controller
             ->orderBy('month', 'desc')
             ->get();
 
-        // 2. Dữ liệu biểu đồ xu hướng tháng cho dự án này
-    $trendStats = Trip::where('project_id', $project->id)
-        ->select(
-            DB::raw("DATE_FORMAT(trip_date, '%Y-%m') as month"),
-            DB::raw("SUM(total_price) as revenue"),
-            DB::raw("SUM(volume_m3) as volume")
-        )
-        ->groupBy('month')
-        ->orderBy('month', 'asc')
-        ->get();
-
-    $chartMonths = [];
-    $chartRevenue = [];
-    $chartVolume = [];
-    foreach ($trendStats as $stat) {
-        $chartMonths[] = Carbon::parse($stat->month . '-01')->format('m/Y');
-        $chartRevenue[] = (int)$stat->revenue;
-        $chartVolume[] = (float)$stat->volume;
-    }
-
-    // 3. Cơ cấu vật liệu trong dự án này
-    $materialStats = Trip::where('project_id', $project->id)
-        ->select('materials.name', DB::raw('SUM(total_price) as total_revenue'))
-        ->join('materials', 'trips.material_id', '=', 'materials.id')
-        ->groupBy('materials.id', 'materials.name')
-        ->orderBy('total_revenue', 'desc')
-        ->get();
-
-    $materialNames = $materialStats->pluck('name');
-    $materialRevenue = $materialStats->pluck('total_revenue')->map(fn($v) => (int)$v);
+            // 2. Dữ liệu biểu đồ theo ngày (Số chuyến)
+        $dailyStats = Trip::where('project_id', $project->id)
+            ->select(
+                'trip_date',
+                DB::raw("SUM(quantity) as trip_count")
+            )
+            ->groupBy('trip_date')
+            ->orderBy('trip_date', 'asc')
+            ->get();
 
         // Tổng toàn dự án
         $projectSummary = [
             'total_trips' => $months->sum('trip_count'),
-            'total_volume' => $months->sum('total_volume'),
             'total_price' => $months->sum('total_price'),
         ];
+        
+        $chartDates = [];
+        $chartTripCount = [];
+        foreach ($dailyStats as $stat) {
+            $chartDates[] = $stat->trip_date->format('d/m');
+            $chartTripCount[] = (float)$stat->trip_count;
+        }
 
         return view('trips.project', compact(
             'project', 'months', 'projectSummary',
-            'chartMonths', 'chartRevenue', 'chartVolume',
-            'materialNames', 'materialRevenue'
+            'chartDates', 'chartTripCount'
         ));
     }
 
@@ -100,8 +86,7 @@ class TripController extends Controller
             ->get();
 
         $summary = [
-            'total_trips' => $trips->count(),
-            'total_volume' => $trips->sum('volume_m3'),
+            'total_trips' => $trips->sum('quantity'),
             'total_price' => $trips->sum('total_price'),
         ];
 
@@ -151,6 +136,11 @@ class TripController extends Controller
 
     public function store(Request $request)
     {
+        // Loại bỏ dấu chấm phân cách hàng nghìn khỏi các trường giá tiền
+        if ($request->has('freight_price')) $request->merge(['freight_price' => str_replace('.', '', $request->freight_price)]);
+        if ($request->has('sell_price')) $request->merge(['sell_price' => str_replace('.', '', $request->sell_price)]);
+        if ($request->has('buy_price')) $request->merge(['buy_price' => str_replace('.', '', $request->buy_price)]);
+
         $validated = $request->validate([
             'trip_date' => 'required|date',
             'project_id' => 'required|exists:projects,id',
@@ -158,16 +148,15 @@ class TripController extends Controller
             'driver_id' => 'required|exists:employees,id',
             'material_id' => 'required|exists:materials,id',
             'route_id' => 'required|exists:routes,id',
-            'volume_m3' => 'required|numeric|min:0',
-            'price_per_m3' => 'required|numeric|min:0',
+            'quantity' => 'required|numeric|min:0',
+            'freight_price' => 'required|numeric|min:0',
+            'sell_price' => 'required|numeric|min:0',
+            'buy_price' => 'required|numeric|min:0',
             'note' => 'nullable|string',
         ]);
 
-        $validated['total_price'] = $validated['volume_m3'] * $validated['price_per_m3'];
-        
-        $material = Material::find($validated['material_id']);
-        $validated['cost_per_m3'] = $material->import_price;
-        $validated['profit'] = ($validated['price_per_m3'] - $material->import_price) * $validated['volume_m3'];
+        $validated['total_price'] = $validated['quantity'] * $validated['freight_price'];
+        $validated['profit'] = ($validated['sell_price'] - $validated['buy_price']) * $validated['quantity'];
 
         Trip::create($validated);
 
@@ -176,6 +165,13 @@ class TripController extends Controller
             return redirect()->route('trips.create', [
                 'trip_date' => $validated['trip_date'],
                 'project_id' => $validated['project_id'],
+                'vehicle_id' => $validated['vehicle_id'],
+                'driver_id' => $validated['driver_id'],
+                'material_id' => $validated['material_id'],
+                'route_id' => $validated['route_id'],
+                'freight_price' => $validated['freight_price'],
+                'buy_price' => $validated['buy_price'],
+                'sell_price' => $validated['sell_price'],
             ])->with('success', 'Đã lưu chuyến xe. Tiếp tục thêm mới.');
         }
 
@@ -201,6 +197,11 @@ class TripController extends Controller
 
     public function update(Request $request, Trip $trip)
     {
+        // Loại bỏ dấu chấm phân cách hàng nghìn khỏi các trường giá tiền
+        if ($request->has('freight_price')) $request->merge(['freight_price' => str_replace('.', '', $request->freight_price)]);
+        if ($request->has('sell_price')) $request->merge(['sell_price' => str_replace('.', '', $request->sell_price)]);
+        if ($request->has('buy_price')) $request->merge(['buy_price' => str_replace('.', '', $request->buy_price)]);
+
         $validated = $request->validate([
             'trip_date' => 'required|date',
             'project_id' => 'required|exists:projects,id',
@@ -208,16 +209,15 @@ class TripController extends Controller
             'driver_id' => 'required|exists:employees,id',
             'material_id' => 'required|exists:materials,id',
             'route_id' => 'required|exists:routes,id',
-            'volume_m3' => 'required|numeric|min:0',
-            'price_per_m3' => 'required|numeric|min:0',
+            'quantity' => 'required|numeric|min:0',
+            'freight_price' => 'required|numeric|min:0',
+            'sell_price' => 'required|numeric|min:0',
+            'buy_price' => 'required|numeric|min:0',
             'note' => 'nullable|string',
         ]);
 
-        $validated['total_price'] = $validated['volume_m3'] * $validated['price_per_m3'];
-        
-        $material = Material::find($validated['material_id']);
-        $validated['cost_per_m3'] = $material->import_price;
-        $validated['profit'] = ($validated['price_per_m3'] - $material->import_price) * $validated['volume_m3'];
+        $validated['total_price'] = $validated['quantity'] * $validated['freight_price'];
+        $validated['profit'] = ($validated['sell_price'] - $validated['buy_price']) * $validated['quantity'];
 
         $trip->update($validated);
 
@@ -241,12 +241,6 @@ class TripController extends Controller
             'year' => $date->year,
             'month' => $date->month,
         ])->with('success', 'Đã xoá chuyến xe.');
-    }
-
-    // API endpoint: lấy volume mặc định của xe
-    public function getVehicleVolume(Vehicle $vehicle)
-    {
-        return response()->json(['default_volume_m3' => $vehicle->default_volume_m3]);
     }
 
 }

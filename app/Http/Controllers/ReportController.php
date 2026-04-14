@@ -44,7 +44,7 @@ class ReportController extends Controller
         // Tổng kết
         $summary = [
             'total_trips' => $trips->count(),
-            'total_volume' => $trips->sum('volume_m3'),
+            'total_quantity' => $trips->sum('quantity'),
             'total_price' => $trips->sum('total_price'),
             'total_profit' => $trips->sum('profit'),
         ];
@@ -73,6 +73,8 @@ class ReportController extends Controller
 
         // Tạo tên file mô tả
         $parts = ['bao-cao-chuyen-xe'];
+        $exportType = $request->input('export_type', 'freight');
+        $parts[] = ($exportType == 'profit') ? 'loi-nhuan' : 'cuoc-phi';
 
         if ($request->filled('project_id')) {
             $project = Project::find($request->project_id);

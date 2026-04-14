@@ -4,7 +4,7 @@
         <td>{{ $trip->vehicle->plate_number }}</td>
         <td>{{ $trip->driver->name }}</td>
         <td>{{ $trip->material->name }}</td>
-        <td class="text-end">{{ number_format($trip->volume_m3, 2) }}</td>
+        <td class="text-end">{{ $trip->quantity + 0 }}</td>
         <td class="text-end fw-bold text-success">{{ number_format($trip->total_price, 0, ',', '.') }}đ</td>
         <td class="small">{{ Str::limit($trip->note, 30) }}</td>
     </tr>

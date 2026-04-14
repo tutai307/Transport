@@ -23,7 +23,6 @@ class VehicleController extends Controller
     {
         $validated = $request->validate([
             'plate_number' => 'required|string|max:20',
-            'default_volume_m3' => 'required|numeric|min:0',
         ]);
 
         Vehicle::create($validated);
@@ -40,7 +39,6 @@ class VehicleController extends Controller
     {
         $validated = $request->validate([
             'plate_number' => 'required|string|max:20',
-            'default_volume_m3' => 'required|numeric|min:0',
             'is_active' => 'boolean',
         ]);
 

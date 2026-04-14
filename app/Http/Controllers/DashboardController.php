@@ -13,8 +13,8 @@ class DashboardController extends Controller
     public function index()
     {
         // 1. Chỉ số tổng quan
-        $totalTrips = Trip::count();
-        $totalRevenue = Trip::sum('total_price');
+        $totalTrips = Trip::sum('quantity');
+        $totalFreightAmount = Trip::sum('total_price');
         $totalProfit = Trip::sum('profit');
 
         // 2. Dữ liệu biểu đồ xu hướng (6 tháng gần nhất)
@@ -54,7 +54,7 @@ class DashboardController extends Controller
         }
 
         return view('dashboard', compact(
-            'totalTrips', 'totalRevenue', 'totalProfit',
+            'totalTrips', 'totalFreightAmount', 'totalProfit',
             'chartMonths', 'chartRevenue', 'chartProfit',
             'projectNames', 'projectRevenue'
         ));

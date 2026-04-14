@@ -11,8 +11,8 @@
                 <span class="fw-semibold">{{ $trip->material->name }}</span>
             </div>
             <div class="col-6 text-end">
-                <small class="text-muted d-block">Khối lượng</small>
-                <span class="fw-bold fs-5">{{ number_format($trip->volume_m3, 2) }}</span> <small>m³</small>
+                <small class="text-muted d-block">Số lượng</small>
+                <span class="fw-bold fs-5">{{ $trip->quantity + 0 }}</span>
             </div>
             <div class="col-12 mt-2 pt-2 border-top d-flex justify-content-between align-items-center">
                 <span class="text-success fw-bold">{{ number_format($trip->total_price, 0, ',', '.') }} đ</span>

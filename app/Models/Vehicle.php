@@ -6,12 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Vehicle extends Model
 {
-    protected $fillable = ['plate_number', 'default_volume_m3', 'is_active'];
+    protected $fillable = ['plate_number', 'is_active'];
 
     protected function casts(): array
     {
         return [
-            'default_volume_m3' => 'decimal:2',
             'is_active' => 'boolean',
         ];
     }

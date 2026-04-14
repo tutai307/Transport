@@ -24,13 +24,6 @@
         <div class="invalid-feedback">Vui lòng nhập biển số xe.</div>
     </div>
 
-    <div class="mb-3">
-        <label for="default_volume_m3" class="form-label">Số khối (m³) <span class="text-danger">*</span></label>
-        <input type="number" step="0.01" class="form-control" id="default_volume_m3" name="default_volume_m3"
-               value="{{ old('default_volume_m3', 0) }}" required min="0.01">
-        <div class="invalid-feedback">Vui lòng nhập số khối (lớn hơn 0).</div>
-    </div>
-
     <div class="d-flex gap-2">
         <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Lưu</button>
         <a href="{{ route('vehicles.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Quay lại</a>

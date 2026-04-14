@@ -13,10 +13,11 @@ class Trip extends Model
         'driver_id',
         'material_id',
         'route_id',
-        'volume_m3',
-        'price_per_m3',
+        'quantity',
+        'freight_price',
+        'sell_price',
         'total_price',
-        'cost_per_m3',
+        'buy_price',
         'profit',
         'note',
     ];
@@ -25,10 +26,11 @@ class Trip extends Model
     {
         return [
             'trip_date' => 'date',
-            'volume_m3' => 'decimal:2',
-            'price_per_m3' => 'decimal:2',
+            'quantity' => 'decimal:2',
+            'freight_price' => 'decimal:2',
+            'sell_price' => 'decimal:2',
             'total_price' => 'decimal:2',
-            'cost_per_m3' => 'decimal:2',
+            'buy_price' => 'decimal:2',
             'profit' => 'decimal:2',
         ];
     }

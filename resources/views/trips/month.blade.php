@@ -16,9 +16,19 @@
         </div>
         <div class="col-12 col-md-auto">
             <div class="d-flex gap-2 w-100 w-md-auto">
-                <a href="{{ route('reports.export', ['project_id' => $project->id, 'month' => $month, 'year' => $year]) }}" class="btn btn-success btn-sm flex-fill flex-md-grow-0">
-                    <i class="bi bi-file-earmark-excel"></i> Xuất Excel
-                </a>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-success btn-sm dropdown-toggle flex-fill flex-md-grow-0" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-file-earmark-excel"></i> Xuất Excel
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{{ route('reports.export', ['project_id' => $project->id, 'month' => $month, 'year' => $year, 'export_type' => 'freight']) }}">
+                            <i class="bi bi-currency-dollar"></i> Xuất theo giá cước
+                        </a></li>
+                        <li><a class="dropdown-item" href="{{ route('reports.export', ['project_id' => $project->id, 'month' => $month, 'year' => $year, 'export_type' => 'profit']) }}">
+                            <i class="bi bi-graph-up"></i> Xuất theo lợi nhuận
+                        </a></li>
+                    </ul>
+                </div>
                 <a href="{{ route('trips.create', ['project_id' => $project->id]) }}" class="btn btn-primary btn-sm flex-fill flex-md-grow-0">
                     <i class="bi bi-plus-circle"></i> Thêm chuyến
                 </a>
@@ -29,27 +39,19 @@
 
 {{-- Tổng kết tháng --}}
 <div class="row g-2 mb-4">
-    <div class="col-4 col-md-4">
+    <div class="col-6 col-md-6">
         <div class="card border-primary h-100">
             <div class="card-body text-center p-2">
-                <small class="text-muted d-block small">Chuyến</small>
-                <h5 class="text-primary mb-0">{{ number_format($summary['total_trips']) }}</h5>
+                <small class="text-muted d-block small">Số chuyến</small>
+                <h5 class="text-primary mb-0">{{ $summary['total_trips'] + 0 }}</h5>
             </div>
         </div>
     </div>
-    <div class="col-4 col-md-4">
-        <div class="card border-info h-100">
-            <div class="card-body text-center p-2">
-                <small class="text-muted d-block small">Khối lượng</small>
-                <h5 class="text-info mb-0">{{ number_format($summary['total_volume'], 1) }}</h5>
-            </div>
-        </div>
-    </div>
-    <div class="col-4 col-md-4">
+    <div class="col-6 col-md-6">
         <div class="card border-success h-100">
             <div class="card-body text-center p-2">
-                <small class="text-muted d-block small">Tiền (triệu)</small>
-                <h5 class="text-success mb-0">{{ number_format($summary['total_price'] / 1000000, 1) }}M</h5>
+                <small class="text-muted d-block small">Tổng tiền</small>
+                <h5 class="text-success mb-0">{{ number_format($summary['total_price'], 0, ',', '.') }}đ</h5>
             </div>
         </div>
     </div>
@@ -67,7 +69,7 @@
                 <th>Tài xế</th>
                 <th>Vật liệu</th>
                 <th>Tuyến đường</th>
-                <th class="text-end">KL (m³)</th>
+                <th class="text-end">Số lượng</th>
                 <th class="text-end">Thành tiền</th>
                 <th>Ghi chú</th>
                 <th style="width:100px">Thao tác</th>
@@ -82,8 +84,8 @@
                     <td>{{ $trip->driver->name }}</td>
                     <td>{{ $trip->material->name }}</td>
                     <td>{{ $trip->route->full_name }}</td>
-                    <td class="text-end">{{ number_format($trip->volume_m3, 2) }}</td>
-                    <td class="text-end fw-bold">{{ number_format($trip->total_price, 0, ',', '.') }}</td>
+                    <td class="text-end">{{ $trip->quantity + 0 }}</td>
+                    <td class="text-end fw-bold">{{ number_format($trip->total_price, 0, ',', '.') }}đ</td>
                     <td>{{ Str::limit($trip->note, 30) }}</td>
                     <td>
                         <div class="d-flex gap-1">
@@ -139,8 +141,8 @@
                         <span class="fw-semibold">{{ $trip->vehicle->plate_number }}</span> — {{ $trip->material->name }}
                     </div>
                     <div class="col-6 text-end">
-                        <small class="text-muted d-block">Khối lượng</small>
-                        <span class="fw-bold fs-5">{{ number_format($trip->volume_m3, 2) }}</span> <small>m³</small>
+                        <small class="text-muted d-block">Số chuyến</small>
+                        <span class="fw-bold fs-5">{{ $trip->quantity + 0 }}</span>
                     </div>
                     <div class="col-12 mt-2 pt-2 border-top d-flex justify-content-between align-items-center">
                         <span class="text-success fw-bold fs-5">{{ number_format($trip->total_price, 0, ',', '.') }} đ</span>

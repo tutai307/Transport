@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Material extends Model
 {
-    protected $fillable = ['name', 'code', 'unit', 'import_price', 'sell_price', 'is_active'];
+    protected $fillable = ['name', 'code', 'import_price', 'sell_price', 'is_active'];
 
     protected function casts(): array
     {

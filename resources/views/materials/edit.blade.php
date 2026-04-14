@@ -18,21 +18,10 @@
         </div>
     @endif
 
-    <div class="row">
-        <div class="col-md-6">
-            <div class="mb-3">
-                <label for="name" class="form-label">Tên vật liệu <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $material->name) }}" required>
-                <div class="invalid-feedback">Vui lòng nhập tên vật liệu.</div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="mb-3">
-                <label for="unit" class="form-label">Đơn vị tính</label>
-                <input type="text" class="form-control" id="unit" name="unit" value="{{ old('unit', $material->unit) }}"
-                       placeholder="VD: m3, tấn...">
-            </div>
-        </div>
+    <div class="mb-3">
+        <label for="name" class="form-label">Tên vật liệu <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $material->name) }}" required>
+        <div class="invalid-feedback">Vui lòng nhập tên vật liệu.</div>
     </div>
 
     <div class="row">

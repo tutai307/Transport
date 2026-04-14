@@ -15,9 +15,19 @@
         </div>
         <div class="col-12 col-md-auto">
             <div class="d-flex gap-2">
-                <a href="{{ route('reports.export', ['project_id' => $project->id]) }}" class="btn btn-success btn-sm flex-fill flex-md-grow-0">
-                    <i class="bi bi-file-earmark-excel"></i> Xuất Excel
-                </a>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-success btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-file-earmark-excel"></i> Xuất Excel
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{{ route('reports.export', ['project_id' => $project->id, 'export_type' => 'freight']) }}">
+                            <i class="bi bi-currency-dollar"></i> Xuất theo giá cước
+                        </a></li>
+                        <li><a class="dropdown-item" href="{{ route('reports.export', ['project_id' => $project->id, 'export_type' => 'profit']) }}">
+                            <i class="bi bi-graph-up"></i> Xuất theo lợi nhuận
+                        </a></li>
+                    </ul>
+                </div>
                 <a href="{{ route('trips.create', ['project_id' => $project->id]) }}" class="btn btn-primary btn-sm flex-fill flex-md-grow-0">
                     <i class="bi bi-plus-circle"></i> Thêm chuyến
                 </a>
@@ -28,27 +38,19 @@
 
 {{-- Tổng kết dự án --}}
 <div class="row g-2 mb-4">
-    <div class="col-4 col-md-4">
+    <div class="col-6 col-md-6">
         <div class="card border-primary h-100">
             <div class="card-body text-center p-2">
                 <small class="text-muted d-block small">Số chuyến</small>
-                <h5 class="text-primary mb-0 fw-bold">{{ number_format($projectSummary['total_trips']) }}</h5>
+                <h5 class="text-primary mb-0 fw-bold">{{ $projectSummary['total_trips'] + 0 }}</h5>
             </div>
         </div>
     </div>
-    <div class="col-4 col-md-4">
-        <div class="card border-info h-100">
-            <div class="card-body text-center p-2">
-                <small class="text-muted d-block small">Khối lượng</small>
-                <h5 class="text-info mb-0 fw-bold">{{ number_format($projectSummary['total_volume'], 1) }}</h5>
-            </div>
-        </div>
-    </div>
-    <div class="col-4 col-md-4">
+    <div class="col-6 col-md-6">
         <div class="card border-success h-100">
             <div class="card-body text-center p-2">
-                <small class="text-muted d-block small">Tiền (triệu)</small>
-                <h5 class="text-success mb-0 fw-bold">{{ number_format($projectSummary['total_price'] / 1000000, 1) }}</h5>
+                <small class="text-muted d-block small">Tổng tiền</small>
+                <h5 class="text-success mb-0 fw-bold">{{ number_format($projectSummary['total_price'], 0, ',', '.') }}đ</h5>
             </div>
         </div>
     </div>
@@ -56,23 +58,13 @@
 
 {{-- Biểu đồ chi tiết dự án --}}
 <div class="row g-3 mb-4">
-    <div class="col-lg-8">
+    <div class="col-12">
         <div class="card border-0 shadow-sm">
-            <div class="card-header py-3 border-0">
-                <h6 class="mb-0 fw-bold"><i class="bi bi-graph-up text-primary"></i> Xu hướng doanh thu & Khối lượng</h6>
+            <div class="card-header py-3 border-0 bg-transparent">
+                <h6 class="mb-0 fw-bold"><i class="bi bi-bar-chart-line text-primary"></i> Biểu đồ số chuyến theo ngày</h6>
             </div>
             <div class="card-body">
-                <div id="projectTrendChart"></div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-4">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header py-3 border-0">
-                <h6 class="mb-0 fw-bold"><i class="bi bi-pie-chart text-success"></i> Cơ cấu vật liệu</h6>
-            </div>
-            <div class="card-body">
-                <div id="projectMaterialChart"></div>
+                <div id="dailyVolumeChart"></div>
             </div>
         </div>
     </div>
@@ -91,25 +83,27 @@
                             Tháng {{ $m->month }}/{{ $m->year }}
                         </h5>
                         <div class="row text-center">
-                            <div class="col-4">
+                            <div class="col-6">
                                 <div class="text-muted small">Chuyến</div>
-                                <div class="fw-bold fs-5">{{ number_format($m->trip_count) }}</div>
+                                <div class="fw-bold fs-5">{{ $m->trip_count + 0 }}</div>
                             </div>
-                            <div class="col-4">
-                                <div class="text-muted small">KL (m³)</div>
-                                <div class="fw-bold">{{ number_format($m->total_volume, 1) }}</div>
-                            </div>
-                            <div class="col-4">
+                            <div class="col-6">
                                 <div class="text-muted small">Tiền</div>
                                 <div class="fw-bold text-success">{{ number_format($m->total_price, 0, ',', '.') }}đ</div>
                             </div>
                         </div>
                     </div>
                     <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
-                        <a href="{{ route('reports.export', ['project_id' => $project->id, 'year' => $m->year, 'month' => $m->month]) }}" 
-                           class="btn btn-sm btn-outline-success" title="Xuất Excel tháng này">
-                            <i class="bi bi-file-earmark-excel"></i> Xuất
-                        </a>
+                        <div class="d-flex gap-1">
+                            <a href="{{ route('reports.export', ['project_id' => $project->id, 'year' => $m->year, 'month' => $m->month, 'export_type' => 'freight']) }}" 
+                               class="btn btn-sm btn-outline-success" title="Xuất Cước tháng này">
+                                <i class="bi bi-file-earmark-excel"></i> Cước
+                            </a>
+                            <a href="{{ route('reports.export', ['project_id' => $project->id, 'year' => $m->year, 'month' => $m->month, 'export_type' => 'profit']) }}" 
+                               class="btn btn-sm btn-outline-warning" title="Xuất Lợi Nhuận tháng này">
+                                <i class="bi bi-file-earmark-excel"></i> Lãi
+                            </a>
+                        </div>
                         <span class="text-primary">Xem chi tiết <i class="bi bi-chevron-right"></i></span>
                     </div>
                 </div>
@@ -132,80 +126,51 @@
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. Biểu đồ xu hướng (Doanh thu & Khối lượng)
-    var trendOptions = {
+    var options = {
         series: [{
-            name: 'Doanh thu (đ)',
+            name: 'Số chuyến',
             type: 'column',
-            data: @json($chartRevenue)
-        }, {
-            name: 'Khối lượng (m³)',
-            type: 'line',
-            data: @json($chartVolume)
+            data: @json($chartTripCount)
         }],
         chart: {
-            id: 'projectTrendChart',
-            height: 300,
-            type: 'line',
+            height: 350,
+            type: 'bar',
             toolbar: { show: false }
         },
-        stroke: { width: [0, 4] },
+        stroke: {
+            width: [0, 4]
+        },
+        title: {
+            text: ''
+        },
+        dataLabels: {
+            enabled: true,
+            enabledOnSeries: [0, 1]
+        },
+        labels: @json($chartDates),
+        xaxis: {
+            type: 'category'
+        },
+        yaxis: {
+            title: {
+                text: 'Số chuyến',
+            },
+        },
         colors: ['#0d6efd', '#198754'],
-        xaxis: { categories: @json($chartMonths) },
-        yaxis: [{
-            title: { text: 'Doanh thu' },
-            labels: {
-                formatter: function (val) { return new Intl.NumberFormat('vi-VN').format(val); }
-            }
-        }, {
-            opposite: true,
-            title: { text: 'Khối lượng' }
-        }],
         tooltip: {
             shared: true,
             intersect: false,
-            y: {
-                formatter: function (y) {
-                    if (typeof y !== "undefined") {
-                        return new Intl.NumberFormat('vi-VN').format(y);
-                    }
-                    return y;
-                }
-            }
         }
     };
-    new ApexCharts(document.querySelector("#projectTrendChart"), trendOptions).render();
 
-    // 2. Biểu đồ vật liệu
-    var materialOptions = {
-        series: @json($materialRevenue),
-        chart: {
-            id: 'projectMaterialChart',
-            type: 'pie',
-            height: 300
-        },
-        labels: @json($materialNames),
-        colors: ['#0d6efd', '#20c997', '#ffc107', '#fd7e14', '#dc3545', '#6610f2'],
-        legend: { position: 'bottom' },
-        tooltip: {
-            y: {
-                formatter: function (value) {
-                    return new Intl.NumberFormat('vi-VN').format(value) + " đ";
-                }
-            }
-        }
-    };
-    new ApexCharts(document.querySelector("#projectMaterialChart"), materialOptions).render();
+    var chart = new ApexCharts(document.querySelector("#dailyVolumeChart"), options);
+    chart.render();
 
-    // Lắng nghe sự kiện đổi theme để cập nhật biểu đồ
     window.addEventListener('theme-changed', function(e) {
         const isDark = e.detail.theme === 'dark';
-        const themeConfig = {
+        chart.updateOptions({
             theme: { mode: isDark ? 'dark' : 'light' }
-        };
-        
-        ApexCharts.exec('projectTrendChart', 'updateOptions', themeConfig);
-        ApexCharts.exec('projectMaterialChart', 'updateOptions', themeConfig);
+        });
     });
 });
 </script>

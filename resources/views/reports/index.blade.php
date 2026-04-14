@@ -43,9 +43,12 @@
             <i class="bi bi-search"></i>
         </button>
     </div>
-    <div class="col-md-2 d-flex align-items-end">
-        <a href="{{ route('reports.export', request()->query()) }}" class="btn btn-success w-100">
-            <i class="bi bi-file-earmark-excel"></i> Xuất Excel
+    <div class="col-md-3 d-flex align-items-end gap-2">
+        <a href="{{ route('reports.export', array_merge(request()->query(), ['export_type' => 'freight'])) }}" class="btn btn-success w-100">
+            <i class="bi bi-file-earmark-excel"></i> Xuất Cước
+        </a>
+        <a href="{{ route('reports.export', array_merge(request()->query(), ['export_type' => 'profit'])) }}" class="btn btn-warning w-100">
+            <i class="bi bi-file-earmark-excel"></i> Xuất Lãi
         </a>
     </div>
 </form>
@@ -63,15 +66,15 @@
     <div class="col-md-3">
         <div class="card border-info">
             <div class="card-body text-center">
-                <h6 class="text-muted">Tổng khối lượng</h6>
-                <h3 class="text-info mb-0">{{ number_format($summary['total_volume'], 2) }} m³</h3>
+                <h6 class="text-muted">Tổng số lượng</h6>
+                <h3 class="text-info mb-0">{{ number_format($summary['total_quantity'], 2) }}</h3>
             </div>
         </div>
     </div>
     <div class="col-md-3">
         <div class="card border-success">
             <div class="card-body text-center">
-                <h6 class="text-muted">Tổng tiền</h6>
+                <h6 class="text-muted">Tổng tiền cước</h6>
                 <h3 class="text-success mb-0">{{ number_format($summary['total_price'], 0, ',', '.') }}</h3>
             </div>
         </div>
@@ -122,7 +125,7 @@
                 <th>Tài xế</th>
                 <th>Vật liệu</th>
                 <th>Tuyến đường</th>
-                <th class="text-end">KL (m³)</th>
+                <th class="text-end">Số lượng</th>
                 <th class="text-end">Đơn giá</th>
                 <th class="text-end">Thành tiền</th>
                 <th>Ghi chú</th>
@@ -138,9 +141,16 @@
                     <td>{{ $trip->driver->name }}</td>
                     <td>{{ $trip->material->name }}</td>
                     <td>{{ $trip->route->full_name }}</td>
-                    <td class="text-end">{{ number_format($trip->volume_m3, 2) }}</td>
-                    <td class="text-end">{{ number_format($trip->price_per_m3, 0, ',', '.') }}</td>
-                    <td class="text-end fw-bold">{{ number_format($trip->total_price, 0, ',', '.') }}</td>
+                    <td class="text-end">{{ number_format($trip->quantity, 2) }}</td>
+                    <td class="text-end text-muted small">
+                        C: {{ number_format($trip->freight_price, 0, ',', '.') }}<br>
+                        M: {{ number_format($trip->buy_price, 0, ',', '.') }}<br>
+                        B: {{ number_format($trip->sell_price, 0, ',', '.') }}
+                    </td>
+                    <td class="text-end fw-bold">
+                        {{ number_format($trip->total_price, 0, ',', '.') }}<br>
+                        <small class="text-success">L: {{ number_format($trip->profit, 0, ',', '.') }}</small>
+                    </td>
                     <td>{{ Str::limit($trip->note, 30) }}</td>
                 </tr>
             @empty
@@ -153,7 +163,7 @@
             <tfoot class="table-warning">
                 <tr class="fw-bold">
                     <td colspan="7" class="text-end">TỔNG CỘNG:</td>
-                    <td class="text-end">{{ number_format($summary['total_volume'], 2) }}</td>
+                    <td class="text-end">{{ number_format($summary['total_quantity'], 2) }}</td>
                     <td></td>
                     <td class="text-end">{{ number_format($summary['total_price'], 0, ',', '.') }}</td>
                     <td></td>

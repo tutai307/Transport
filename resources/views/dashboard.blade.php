@@ -23,8 +23,8 @@
                         <i class="bi bi-truck fs-3"></i>
                     </div>
                     <div class="flex-grow-1 ms-3">
-                        <h6 class="text-muted mb-1">Tổng chuyến xe</h6>
-                        <h3 class="mb-0">{{ number_format($totalTrips) }}</h3>
+                        <h6 class="text-muted mb-1">Số chuyến</h6>
+                        <h3 class="mb-0">{{ $totalTrips + 0 }}</h3>
                     </div>
                 </div>
             </div>
@@ -38,8 +38,8 @@
                         <i class="bi bi-currency-dollar fs-3"></i>
                     </div>
                     <div class="flex-grow-1 ms-3">
-                        <h6 class="text-white text-opacity-75 mb-1">Tổng doanh thu</h6>
-                        <h3 class="mb-0">{{ number_format($totalRevenue) }} đ</h3>
+                        <h6 class="text-white text-opacity-75 mb-1">Tổng giá cước</h6>
+                        <h3 class="mb-0">{{ number_format($totalFreightAmount) }} đ</h3>
                     </div>
                 </div>
             </div>

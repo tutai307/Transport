@@ -15,7 +15,6 @@
             <tr>
                 <th>#</th>
                 <th>Biển số</th>
-                <th>Số khối (m³)</th>
                 <th>Số chuyến</th>
                 <th>Trạng thái</th>
                 <th style="width:80px">Sửa</th>
@@ -26,7 +25,6 @@
                 <tr class="{{ !$vehicle->is_active ? 'table-secondary' : '' }}">
                     <td>{{ $i + 1 }}</td>
                     <td class="fw-bold">{{ $vehicle->plate_number }}</td>
-                    <td>{{ number_format($vehicle->default_volume_m3, 2) }}</td>
                     <td>{{ $vehicle->trips_count }}</td>
                     <td>
                         @if($vehicle->is_active)
