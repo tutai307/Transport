@@ -63,7 +63,6 @@ class DatabaseSeeder extends Seeder
 
             Vehicle::create([
                 'plate_number' => $item['plate'],
-                'default_volume_m3' => 5,
                 'is_active' => true
             ]);
         }
