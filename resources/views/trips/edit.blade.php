@@ -115,9 +115,9 @@
         <div class="col-md-3">
             <div class="mb-3">
                 <label for="quantity" class="form-label">Số chuyến <span class="text-danger">*</span></label>
-                <input type="number" step="0.01" class="form-control" id="quantity" name="quantity"
-                       value="{{ old('quantity', $trip->quantity) }}" required min="0.01">
-                <div class="invalid-feedback">Vui lòng nhập số chuyến.</div>
+                <input type="number" step="1" class="form-control" id="quantity" name="quantity"
+                       value="{{ old('quantity', (int)$trip->quantity) }}" required min="1">
+                <div class="invalid-feedback">Vui lòng nhập số chuyến (số nguyên dương).</div>
             </div>
         </div>
         <div class="col-md-3">
@@ -233,9 +233,19 @@ document.addEventListener('DOMContentLoaded', function() {
         calculateTotal();
     });
 
+    // Auto-clear số 0 khi focus vào số chuyến
+    quantityInput.addEventListener('focus', function() {
+        if (this.value === '0') this.value = '';
+    });
+    quantityInput.addEventListener('blur', function() {
+        if (this.value === '') this.value = '0';
+    });
+
     // Initial calculation
     calculateTotal();
 });
 </script>
 @endpush
+
+@include('trips.partials.route_create_modal')
 @endsection

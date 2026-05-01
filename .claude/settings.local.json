@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php artisan *)",
+      "Bash(php -r \"require 'vendor/autoload.php'; echo 'OK';\")",
+      "Bash(curl -s \"https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.js\")",
+      "Bash(php -l app/Http/Controllers/TripController.php)"
+    ]
+  }
+}

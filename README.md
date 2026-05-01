@@ -1,60 +1,120 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Transport Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Hệ thống quản lý vận chuyển hàng hóa xây dựng trên nền tảng Laravel 12, hỗ trợ theo dõi chuyến xe, doanh thu, lợi nhuận và xuất báo cáo Excel.
 
-## About Laravel
+## Tech Stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Backend**: Laravel 12 (PHP 8.2+)
+- **Frontend**: Blade + Alpine.js + Tailwind CSS
+- **Database**: SQLite (mặc định), hỗ trợ MySQL/PostgreSQL
+- **Build tool**: Vite 7
+- **Auth**: Laravel Breeze
+- **Export**: Maatwebsite Excel 3.1
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tính năng chính
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Quản lý chuyến xe**: Tạo, sửa, xóa chuyến với đầy đủ thông tin (dự án, xe, tài xế, vật tư, tuyến đường, giá cước)
+- **Tính toán tự động**: Tổng cước, lợi nhuận tự động theo công thức `(giá bán - giá mua) × số lượng`
+- **Báo cáo & thống kê**: Dashboard KPI, biểu đồ doanh thu 6 tháng, top dự án theo doanh thu
+- **Lọc & xuất Excel**: Lọc báo cáo theo dự án, khoảng thời gian, xe; xuất file Excel động
+- **Quản lý danh mục**: Dự án, Xe, Nhân viên, Vật tư, Tuyến đường
+- **Responsive**: Tương thích mobile với Tailwind CSS
 
-## Learning Laravel
+## Yêu cầu hệ thống
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- PHP >= 8.2
+- Composer
+- Node.js >= 18 + npm
+- SQLite (hoặc MySQL/PostgreSQL)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Cài đặt
 
-## Laravel Sponsors
+```bash
+# Clone repository
+git clone <repository-url>
+cd transport
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# Cài đặt toàn bộ (dependencies + migrate + seed)
+composer setup
+```
 
-### Premium Partners
+Hoặc cài đặt từng bước:
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+composer install
+npm install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+npm run build
+```
 
-## Contributing
+## Chạy development
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+# Khởi động đồng thời Laravel server + queue + log + Vite
+composer dev
+```
 
-## Code of Conduct
+Ứng dụng chạy tại `http://localhost:8000`.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Tài khoản mặc định sau khi seed:
 
-## Security Vulnerabilities
+| Email | Mật khẩu | Vai trò |
+|---|---|---|
+| admin@example.com | password | Admin |
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Cấu trúc thư mục
 
-## License
+```
+app/
+├── Exports/           # Class xuất Excel
+├── Http/
+│   ├── Controllers/   # Logic nghiệp vụ
+│   └── Requests/      # Validation
+├── Models/            # Eloquent models
+└── View/              # View components
+database/
+├── migrations/        # Schema database
+└── seeders/           # Dữ liệu mẫu
+resources/views/       # Blade templates
+routes/
+├── web.php            # Routes chính
+└── auth.php           # Routes xác thực
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# Transport
+## Các routes chính
+
+| Route | Mô tả |
+|---|---|
+| `/dashboard` | Tổng quan KPI và biểu đồ |
+| `/trips` | Danh sách chuyến theo dự án |
+| `/trips/project/{project}/{year}/{month}` | Chi tiết chuyến theo tháng |
+| `/reports` | Báo cáo có bộ lọc |
+| `/reports/export` | Xuất Excel |
+| `/projects`, `/vehicles`, `/employees` | Quản lý danh mục |
+| `/materials`, `/routes` | Quản lý vật tư, tuyến đường |
+
+## Database
+
+Các bảng chính:
+
+- `trips` — Chuyến xe (bảng trung tâm)
+- `projects` — Dự án/công trình
+- `vehicles` — Phương tiện vận chuyển
+- `employees` — Tài xế/nhân viên
+- `materials` — Vật tư/hàng hóa
+- `routes` — Tuyến đường
+
+## Lệnh hữu ích
+
+```bash
+composer test                         # Chạy test
+php artisan pint                      # Format code PHP
+php artisan migrate:fresh --seed      # Reset và seed lại database
+npm run build                         # Build assets production
+```
+
+## Giấy phép
+
+MIT

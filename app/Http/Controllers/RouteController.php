@@ -37,6 +37,25 @@ class RouteController extends Controller
         return view('routes.edit', compact('route'));
     }
 
+    public function quickStore(Request $request)
+    {
+        $validated = $request->validate([
+            'from_location' => 'required|string|max:255',
+            'to_location'   => 'required|string|max:255',
+        ]);
+
+        $route = Route::create([
+            'from_location' => trim($validated['from_location']),
+            'to_location'   => trim($validated['to_location']),
+            'is_active'     => true,
+        ]);
+
+        return response()->json([
+            'id'        => $route->id,
+            'full_name' => $route->full_name,
+        ]);
+    }
+
     public function update(Request $request, Route $route)
     {
         $validated = $request->validate([

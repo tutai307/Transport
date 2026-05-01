@@ -148,7 +148,7 @@ class TripController extends Controller
             'driver_id' => 'required|exists:employees,id',
             'material_id' => 'required|exists:materials,id',
             'route_id' => 'required|exists:routes,id',
-            'quantity' => 'required|numeric|min:0',
+            'quantity' => 'required|integer|min:1',
             'freight_price' => 'required|numeric|min:0',
             'sell_price' => 'required|numeric|min:0',
             'buy_price' => 'required|numeric|min:0',
@@ -209,7 +209,7 @@ class TripController extends Controller
             'driver_id' => 'required|exists:employees,id',
             'material_id' => 'required|exists:materials,id',
             'route_id' => 'required|exists:routes,id',
-            'quantity' => 'required|numeric|min:0',
+            'quantity' => 'required|integer|min:1',
             'freight_price' => 'required|numeric|min:0',
             'sell_price' => 'required|numeric|min:0',
             'buy_price' => 'required|numeric|min:0',
@@ -235,6 +235,10 @@ class TripController extends Controller
         $projectId = $trip->project_id;
         $date = $trip->trip_date;
         $trip->delete();
+
+        if (request()->ajax()) {
+            return response()->json(['success' => true]);
+        }
 
         return redirect()->route('trips.by-month', [
             'project' => $projectId,

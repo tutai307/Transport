@@ -7,6 +7,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\RouteController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -47,8 +48,15 @@ Route::middleware('auth')->group(function () {
     Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('reports/export', [ReportController::class, 'export'])->name('reports.export');
 
+    // Tính lương tài xế
+    Route::get('payroll', [PayrollController::class, 'index'])->name('payroll.index');
+    Route::get('payroll/driver/{employee}', [PayrollController::class, 'byDriver'])->name('payroll.by-driver');
+    Route::get('payroll/driver/{employee}/{year}', [PayrollController::class, 'byYear'])->name('payroll.by-year');
+    Route::get('payroll/driver/{employee}/{year}/{month}', [PayrollController::class, 'byMonth'])->name('payroll.by-month');
+
     // API endpoints cho auto-fill (dùng bởi JavaScript)
     Route::get('api/vehicle-volume/{vehicle}', [TripController::class, 'getVehicleVolume'])->name('api.vehicle-volume');
+    Route::post('api/routes/quick-create', [RouteController::class, 'quickStore'])->name('api.routes.quick-create');
 
     // Profile (từ Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

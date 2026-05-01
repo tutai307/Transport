@@ -131,9 +131,9 @@
         <div class="col-md-3">
             <div class="mb-3">
                 <label for="quantity" class="form-label">Số chuyến <span class="text-danger">*</span></label>
-                <input type="number" step="0.01" class="form-control" id="quantity" name="quantity"
-                       value="{{ old('quantity', 0) }}" required min="0.01">
-                <div class="invalid-feedback">Vui lòng nhập số chuyến.</div>
+                <input type="number" step="1" class="form-control" id="quantity" name="quantity"
+                       value="{{ old('quantity', 0) }}" required min="1">
+                <div class="invalid-feedback">Vui lòng nhập số chuyến (số nguyên dương).</div>
             </div>
         </div>
         <div class="col-md-3">
@@ -217,9 +217,12 @@
                 <th>Xe</th>
                 <th>Tài xế</th>
                 <th>Vật liệu</th>
-                <th class="text-end">Số lượng</th>
+                <th>Cung chặng</th>
+                <th class="text-end">Số chuyến</th>
+                <th class="text-end">Đơn giá</th>
                 <th class="text-end">Thành tiền</th>
                 <th>Ghi chú</th>
+                <th style="width:50px"></th>
             </tr>
         </thead>
         <tbody id="recent-trips-body">
@@ -232,6 +235,8 @@
 <div id="recent-trips-mobile" class="d-block d-md-none">
     @include('trips.partials.recent_trips_cards', ['recentTrips' => $recentTrips])
 </div>
+
+@include('trips.partials.route_create_modal')
 
 @push('scripts')
 <script>
@@ -288,6 +293,14 @@ document.addEventListener('DOMContentLoaded', function() {
             formatCurrency(buyInput);
         }
         calculateTotal();
+    });
+
+    // Auto-clear số 0 khi focus vào số chuyến
+    quantityInput.addEventListener('focus', function() {
+        if (this.value === '0') this.value = '';
+    });
+    quantityInput.addEventListener('blur', function() {
+        if (this.value === '') this.value = '0';
     });
 
     // Initial calculation
@@ -348,9 +361,65 @@ document.addEventListener('DOMContentLoaded', function() {
 
     monthSelect.addEventListener('change', updateRecentTrips);
     yearSelect.addEventListener('change', updateRecentTrips);
-    
+
+    // Khi đổi ngày → tự sync tháng/năm xuống bảng bên dưới
+    // Dùng Flatpickr instance vì altInput:true làm sự kiện "change" không đáng tin
+    function syncMonthFromDate(dateStr) {
+        if (!dateStr) return;
+        const parts = dateStr.split('-');
+        if (parts.length < 2) return;
+        const newYear  = parseInt(parts[0]);
+        const newMonth = parseInt(parts[1]);
+        if (String(monthSelect.value) !== String(newMonth) || String(yearSelect.value) !== String(newYear)) {
+            monthSelect.value = newMonth;
+            yearSelect.value  = newYear;
+            updateRecentTrips();
+        }
+    }
+
+    const tripDateEl = document.getElementById('trip_date');
+    const fpInstance = tripDateEl && tripDateEl._flatpickr;
+    if (fpInstance) {
+        fpInstance.config.onChange.push(function(selectedDates, dateStr) {
+            syncMonthFromDate(dateStr);
+        });
+    } else {
+        // Fallback nếu Flatpickr chưa init (không dùng altInput)
+        tripDateEl.addEventListener('change', function() {
+            syncMonthFromDate(this.value);
+        });
+    }
+
     // Listen for project change (using jQuery for Select2 compatibility)
     $('#project_id_select').on('change', updateRecentTrips);
+
+    // Xoá chuyến xe ngay trong bảng (AJAX) — dùng event delegation vì rows được inject động
+    document.addEventListener('submit', function(e) {
+        const form = e.target.closest('.delete-trip-form');
+        if (!form) return;
+
+        e.preventDefault();
+        if (!confirm('Xoá chuyến xe này?')) return;
+
+        const btn = form.querySelector('button[type="submit"]');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>'; }
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: '_method=DELETE',
+        })
+        .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
+        .then(function() { updateRecentTrips(); })
+        .catch(function() {
+            alert('Có lỗi xảy ra khi xoá.');
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-trash"></i>'; }
+        });
+    });
 });
 </script>
 @endpush

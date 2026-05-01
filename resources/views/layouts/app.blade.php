@@ -290,6 +290,9 @@
                 <a class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" href="{{ route('reports.index') }}">
                     <i class="bi bi-file-earmark-spreadsheet"></i> Báo cáo
                 </a>
+                <a class="nav-link {{ request()->routeIs('payroll.*') ? 'active' : '' }}" href="{{ route('payroll.index') }}">
+                    <i class="bi bi-wallet2"></i> Tính lương
+                </a>
 
                 <hr class="mx-3 my-2">
                 <div class="px-3 mb-2 small text-uppercase text-muted fw-bold" style="font-size: 11px; letter-spacing: 1px;">Hệ thống</div>
@@ -351,6 +354,9 @@
         {{-- Nút Thêm gỡ bỏ theo yêu cầu người dùng --}}
         <a href="{{ route('reports.index') }}" class="{{ request()->routeIs('reports.*') ? 'active' : '' }}">
             <i class="bi bi-file-earmark-spreadsheet"></i> Báo cáo
+        </a>
+        <a href="{{ route('payroll.index') }}" class="{{ request()->routeIs('payroll.*') ? 'active' : '' }}">
+            <i class="bi bi-wallet2"></i> Lương
         </a>
         <a href="{{ route('settings.index') }}" class="{{ request()->routeIs('settings.index', 'projects.*', 'vehicles.*', 'employees.*', 'materials.*', 'routes.*') ? 'active' : '' }}">
             <i class="bi bi-grid"></i>
