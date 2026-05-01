@@ -3,14 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\Trip;
 use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
     public function index()
     {
-        $projects = Project::withCount('trips')
-            ->withSum('trips', 'profit')
+        $projects = Project::withSum('trips', 'quantity')
+            ->addSelect(['trips_profit' => Trip::selectRaw('SUM((sell_price - buy_price - freight_price) * quantity)')
+                ->whereColumn('project_id', 'projects.id')
+            ])
             ->orderBy('is_active', 'desc')
             ->orderBy('name')
             ->get();

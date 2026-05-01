@@ -38,7 +38,7 @@
                         <div class="col-6">
                             <div class="bg-light rounded p-2">
                                 <div class="text-muted small">Số chuyến</div>
-                                <div class="fw-bold fs-5 text-primary">{{ $employee->trips_count }}</div>
+                                <div class="fw-bold fs-5 text-primary">{{ intval($employee->trips_sum_quantity ?? 0) }}</div>
                             </div>
                         </div>
                         <div class="col-6">

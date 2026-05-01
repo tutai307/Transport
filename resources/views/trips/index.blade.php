@@ -17,7 +17,7 @@
 
 <div class="row">
     @forelse($projects as $project)
-        @if($project->trips_count > 0 || $project->is_active)
+        @if(($project->trips_sum_quantity ?? 0) > 0 || $project->is_active)
         <div class="col-md-6 col-lg-4 mb-3">
             <a href="{{ route('trips.by-project', $project) }}" class="text-decoration-none">
                 <div class="card h-100 {{ $project->is_active ? 'border-primary' : 'border-secondary' }} shadow-sm hover-card">
@@ -38,7 +38,7 @@
                         <div class="row text-center mt-3">
                             <div class="col-6">
                                 <div class="text-muted small">Số chuyến</div>
-                                <div class="fw-bold fs-5 text-primary">{{ ($project->total_trips_count ?? 0) + 0 }}</div>
+                                <div class="fw-bold fs-5 text-primary">{{ intval($project->trips_sum_quantity ?? 0) }}</div>
                             </div>
                             <div class="col-6">
                                 <div class="text-muted small">Tổng tiền</div>

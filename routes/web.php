@@ -53,6 +53,7 @@ Route::middleware('auth')->group(function () {
     Route::get('payroll/driver/{employee}', [PayrollController::class, 'byDriver'])->name('payroll.by-driver');
     Route::get('payroll/driver/{employee}/{year}', [PayrollController::class, 'byYear'])->name('payroll.by-year');
     Route::get('payroll/driver/{employee}/{year}/{month}', [PayrollController::class, 'byMonth'])->name('payroll.by-month');
+    Route::get('payroll/driver/{employee}/export', [PayrollController::class, 'export'])->name('payroll.export');
 
     // API endpoints cho auto-fill (dùng bởi JavaScript)
     Route::get('api/vehicle-volume/{vehicle}', [TripController::class, 'getVehicleVolume'])->name('api.vehicle-volume');

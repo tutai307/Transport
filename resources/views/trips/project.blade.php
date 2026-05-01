@@ -42,7 +42,7 @@
         <div class="card border-primary h-100">
             <div class="card-body text-center p-2">
                 <small class="text-muted d-block small">Số chuyến</small>
-                <h5 class="text-primary mb-0 fw-bold">{{ $projectSummary['total_trips'] + 0 }}</h5>
+                <h5 class="text-primary mb-0 fw-bold">{{ intval($projectSummary['total_trips']) }}</h5>
             </div>
         </div>
     </div>
@@ -85,7 +85,7 @@
                         <div class="row text-center">
                             <div class="col-6">
                                 <div class="text-muted small">Chuyến</div>
-                                <div class="fw-bold fs-5">{{ $m->trip_count + 0 }}</div>
+                                <div class="fw-bold fs-5">{{ intval($m->trip_count) }}</div>
                             </div>
                             <div class="col-6">
                                 <div class="text-muted small">Tiền</div>

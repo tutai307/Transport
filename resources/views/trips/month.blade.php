@@ -43,7 +43,7 @@
         <div class="card border-primary h-100">
             <div class="card-body text-center p-2">
                 <small class="text-muted d-block small">Số chuyến</small>
-                <h5 class="text-primary mb-0">{{ $summary['total_trips'] + 0 }}</h5>
+                <h5 class="text-primary mb-0">{{ intval($summary['total_trips']) }}</h5>
             </div>
         </div>
     </div>
@@ -69,7 +69,7 @@
                 <th>Tài xế</th>
                 <th>Vật liệu</th>
                 <th>Tuyến đường</th>
-                <th class="text-end">Số lượng</th>
+                <th class="text-end">Số chuyến</th>
                 <th class="text-end">Thành tiền</th>
                 <th>Ghi chú</th>
                 <th style="width:100px">Thao tác</th>
@@ -84,7 +84,7 @@
                     <td>{{ $trip->driver->name }}</td>
                     <td>{{ $trip->material->name }}</td>
                     <td>{{ $trip->route->full_name }}</td>
-                    <td class="text-end">{{ $trip->quantity + 0 }}</td>
+                    <td class="text-end">{{ intval($trip->quantity) }}</td>
                     <td class="text-end fw-bold">{{ number_format($trip->total_price, 0, ',', '.') }}đ</td>
                     <td>{{ Str::limit($trip->note, 30) }}</td>
                     <td>
@@ -109,6 +109,16 @@
                 </tr>
             @endforelse
         </tbody>
+        @if($trips->isNotEmpty())
+        <tfoot class="table-secondary fw-bold">
+            <tr>
+                <td colspan="6" class="text-end">Tổng cộng</td>
+                <td class="text-end">{{ intval($summary['total_trips']) }}</td>
+                <td class="text-end text-success">{{ number_format($summary['total_price'], 0, ',', '.') }}đ</td>
+                <td colspan="2"></td>
+            </tr>
+        </tfoot>
+        @endif
     </table>
 </div>
 
@@ -142,7 +152,7 @@
                     </div>
                     <div class="col-6 text-end">
                         <small class="text-muted d-block">Số chuyến</small>
-                        <span class="fw-bold fs-5">{{ $trip->quantity + 0 }}</span>
+                        <span class="fw-bold fs-5">{{ intval($trip->quantity) }}</span>
                     </div>
                     <div class="col-12 mt-2 pt-2 border-top d-flex justify-content-between align-items-center">
                         <span class="text-success fw-bold fs-5">{{ number_format($trip->total_price, 0, ',', '.') }} đ</span>

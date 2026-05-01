@@ -27,14 +27,14 @@
             <div class="text-end d-none d-md-block">
                 <div class="text-muted small">Tổng tất cả năm</div>
                 <div class="fw-bold fs-5 text-success">{{ number_format($summary['total_salary'], 0, ',', '.') }}đ</div>
-                <div class="text-muted small">{{ $summary['trip_count'] }} chuyến</div>
+                <div class="text-muted small">{{ intval($summary['trip_count']) }} chuyến</div>
             </div>
         </div>
         {{-- Tổng tiền mobile --}}
         <div class="d-md-none mt-3 p-3 bg-light rounded text-center">
             <div class="text-muted small">Tổng tất cả năm</div>
             <div class="fw-bold fs-4 text-success">{{ number_format($summary['total_salary'], 0, ',', '.') }}đ</div>
-            <div class="text-muted">{{ $summary['trip_count'] }} chuyến</div>
+            <div class="text-muted">{{ intval($summary['trip_count']) }} chuyến</div>
         </div>
     </div>
 </div>
@@ -56,7 +56,7 @@
                     <div class="row g-3">
                         <div class="col-6 col-md-4">
                             <div class="text-muted small">Số chuyến</div>
-                            <div class="fw-bold fs-5 text-primary">{{ $yearData->trip_count }}</div>
+                            <div class="fw-bold fs-5 text-primary">{{ intval($yearData->trip_count) }}</div>
                         </div>
                         <div class="col-6 col-md-4">
                             <div class="text-muted small">Tổng lương</div>

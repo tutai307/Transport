@@ -17,12 +17,8 @@ class TripController extends Controller
     // Trang chính: danh sách dự án có chuyến xe
     public function index()
     {
-        $projects = Project::select('projects.*')
-            ->leftJoin('trips', 'projects.id', '=', 'trips.project_id')
-            ->selectRaw("SUM(trips.quantity) as total_trips_count")
-            ->selectRaw("COUNT(trips.id) as record_count")
+        $projects = Project::withSum('trips', 'quantity')
             ->withSum('trips', 'total_price')
-            ->groupBy('projects.id')
             ->orderBy('is_active', 'desc')
             ->orderBy('name')
             ->get();
@@ -156,7 +152,7 @@ class TripController extends Controller
         ]);
 
         $validated['total_price'] = $validated['quantity'] * $validated['freight_price'];
-        $validated['profit'] = ($validated['sell_price'] - $validated['buy_price']) * $validated['quantity'];
+        $validated['profit'] = ($validated['sell_price'] - $validated['buy_price'] - $validated['freight_price']) * $validated['quantity'];
 
         Trip::create($validated);
 
@@ -217,7 +213,7 @@ class TripController extends Controller
         ]);
 
         $validated['total_price'] = $validated['quantity'] * $validated['freight_price'];
-        $validated['profit'] = ($validated['sell_price'] - $validated['buy_price']) * $validated['quantity'];
+        $validated['profit'] = ($validated['sell_price'] - $validated['buy_price'] - $validated['freight_price']) * $validated['quantity'];
 
         $trip->update($validated);
 

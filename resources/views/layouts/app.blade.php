@@ -45,20 +45,20 @@
         }
 
         /* Override Bootstrap for Dark Mode visibility */
-        [data-bs-theme="dark"] .table-primary { 
-            --bs-table-bg: #1a1d21; 
-            --bs-table-color: #ffffff; 
-            --bs-table-border-color: #373b3e; 
+        [data-bs-theme="dark"] .table-primary {
+            --bs-table-bg: #1a1d21;
+            --bs-table-color: #ffffff;
+            --bs-table-border-color: #373b3e;
             --bs-table-striped-bg: #212529;
         }
         [data-bs-theme="dark"] .table-secondary { --bs-table-bg: #2c3035; --bs-table-color: #adb5bd; }
         [data-bs-theme="dark"] .table-warning { --bs-table-bg: #332b00; --bs-table-color: #ffecb5; --bs-table-border-color: #4d4400; }
         [data-bs-theme="dark"] .table-info { --bs-table-bg: #002b33; --bs-table-color: #b5f2ff; }
-        
+
         [data-bs-theme="dark"] .bg-light { background-color: #212529 !important; color: #f8f9fa !important; }
         [data-bs-theme="dark"] .bg-primary-subtle { background-color: rgba(13, 110, 253, 0.1) !important; color: #0d6efd !important; }
         [data-bs-theme="dark"] .bg-success-subtle { background-color: rgba(25, 135, 84, 0.1) !important; color: #198754 !important; }
-        
+
         [data-bs-theme="dark"] .text-success { color: #4ade80 !important; } /* Sáng hơn (Emerald 400) */
         [data-bs-theme="dark"] .text-danger { color: #f87171 !important; } /* Sáng hơn (Red 400) */
         [data-bs-theme="dark"] .text-warning { color: #fbbf24 !important; } /* Sáng hơn (Amber 400) */
@@ -66,7 +66,7 @@
         [data-bs-theme="dark"] .text-muted { color: #9ca3af !important; }
         [data-bs-theme="dark"] .breadcrumb-item.active { color: #adb5bd; }
         [data-bs-theme="dark"] .card-header { background-color: rgba(255,255,255,0.03); }
-        
+
         /* Select2 Dark Mode Fixes */
         [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection {
             background-color: var(--card-bg);
@@ -288,7 +288,7 @@
                     <i class="bi bi-building"></i> Dự án
                 </a>
                 <a class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" href="{{ route('reports.index') }}">
-                    <i class="bi bi-file-earmark-spreadsheet"></i> Báo cáo
+                    <i class="bi bi-file-earmark-spreadsheet"></i> Xuất hoá đơn
                 </a>
                 <a class="nav-link {{ request()->routeIs('payroll.*') ? 'active' : '' }}" href="{{ route('payroll.index') }}">
                     <i class="bi bi-wallet2"></i> Tính lương
@@ -296,8 +296,8 @@
 
                 <hr class="mx-3 my-2">
                 <div class="px-3 mb-2 small text-uppercase text-muted fw-bold" style="font-size: 11px; letter-spacing: 1px;">Hệ thống</div>
-                
-                <a class="nav-link {{ request()->routeIs('vehicles.*', 'employees.*', 'materials.*', 'routes.*') ? 'active' : '' }}" 
+
+                <a class="nav-link {{ request()->routeIs('vehicles.*', 'employees.*', 'materials.*', 'routes.*') ? 'active' : '' }}"
                    data-bs-toggle="collapse" href="#categoryMenu" role="button" aria-expanded="false">
                     <i class="bi bi-gear"></i> Danh mục <i class="bi bi-chevron-down small ms-auto"></i>
                 </a>
@@ -353,7 +353,7 @@
         </a>
         {{-- Nút Thêm gỡ bỏ theo yêu cầu người dùng --}}
         <a href="{{ route('reports.index') }}" class="{{ request()->routeIs('reports.*') ? 'active' : '' }}">
-            <i class="bi bi-file-earmark-spreadsheet"></i> Báo cáo
+            <i class="bi bi-file-earmark-invoice"></i> Hoá đơn
         </a>
         <a href="{{ route('payroll.index') }}" class="{{ request()->routeIs('payroll.*') ? 'active' : '' }}">
             <i class="bi bi-wallet2"></i> Lương
@@ -383,7 +383,7 @@
         themeToggle.addEventListener('click', () => {
             const currentTheme = html.getAttribute('data-bs-theme');
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            
+
             html.setAttribute('data-bs-theme', newTheme);
             localStorage.setItem('theme', newTheme);
             updateIcon(newTheme);
@@ -434,9 +434,9 @@
                 input.addEventListener('input', function() {
                     let cursorPosition = this.selectionStart;
                     let oldLength = this.value.length;
-                    
+
                     formatCurrency(this);
-                    
+
                     let newLength = this.value.length;
                     // Adjust cursor position (simple approximation)
                     if (newLength > oldLength) {
@@ -458,7 +458,7 @@
             });
         });
     </script>
-    
+
     <!-- Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vn.js" defer></script>
@@ -471,7 +471,7 @@
                 if (input.type === 'date') {
                     input.type = 'text';
                 }
-                
+
                 flatpickr(input, {
                     locale: 'vn',
                     dateFormat: 'Y-m-d',

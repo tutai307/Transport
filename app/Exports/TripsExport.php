@@ -44,6 +44,11 @@ class TripsExport implements FromView, WithTitle, ShouldAutoSize
             $query->where('vehicle_id', $this->filters['vehicle_id']);
         }
 
+        // Lọc theo tài xế (phiếu lương)
+        if (!empty($this->filters['driver_id'])) {
+            $query->where('driver_id', $this->filters['driver_id']);
+        }
+
         $trips = $query->orderBy('trip_date')->orderBy('id')->get();
 
         return view('exports.trips', [

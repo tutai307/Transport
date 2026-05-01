@@ -28,8 +28,8 @@
                     <td>{{ $i + 1 }}</td>
                     <td class="fw-bold">{{ $project->name }}</td>
                     <td>{{ Str::limit($project->description, 50) }}</td>
-                    <td>{{ $project->trips_count }}</td>
-                    <td class="text-success fw-bold">{{ number_format($project->trips_sum_profit, 0, ',', '.') }} đ</td>
+                    <td>{{ intval($project->trips_sum_quantity ?? 0) }}</td>
+                    <td class="text-success fw-bold">{{ number_format($project->trips_profit ?? 0, 0, ',', '.') }} đ</td>
                     <td>
                         @if($project->is_active)
                             <span class="badge bg-success">Đang hoạt động</span>

@@ -15,13 +15,13 @@ class DashboardController extends Controller
         // 1. Chỉ số tổng quan
         $totalTrips = Trip::sum('quantity');
         $totalFreightAmount = Trip::sum('total_price');
-        $totalProfit = Trip::sum('profit');
+        $totalProfit = Trip::selectRaw('SUM((sell_price - buy_price - freight_price) * quantity) as p')->value('p');
 
         // 2. Dữ liệu biểu đồ xu hướng (6 tháng gần nhất)
         $monthlyStats = Trip::select(
             DB::raw("DATE_FORMAT(trip_date, '%Y-%m') as month"),
             DB::raw("SUM(total_price) as revenue"),
-            DB::raw("SUM(profit) as profit")
+            DB::raw("SUM((sell_price - buy_price - freight_price) * quantity) as profit")
         )
         ->groupBy('month')
         ->orderBy('month', 'asc')

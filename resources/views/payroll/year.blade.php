@@ -42,7 +42,7 @@
         <div class="card border-0 shadow-sm text-center">
             <div class="card-body py-3">
                 <div class="text-muted small mb-1">Tổng số chuyến</div>
-                <div class="fw-bold fs-4 text-primary">{{ $yearTotal['trip_count'] }}</div>
+                <div class="fw-bold fs-4 text-primary">{{ intval($yearTotal['trip_count']) }}</div>
             </div>
         </div>
     </div>
@@ -74,7 +74,7 @@
                     <div class="row g-2">
                         <div class="col-5">
                             <div class="text-muted small">Số chuyến</div>
-                            <div class="fw-bold text-primary">{{ $row->trip_count }} chuyến</div>
+                            <div class="fw-bold text-primary">{{ intval($row->trip_count) }} chuyến</div>
                         </div>
                         <div class="col-5">
                             <div class="text-muted small">Tiền lương</div>
@@ -105,7 +105,7 @@
                 <div class="row g-2">
                     <div class="col-6">
                         <div class="text-muted small">Số chuyến</div>
-                        <div class="fw-bold text-primary fs-5">{{ $yearTotal['trip_count'] }} chuyến</div>
+                        <div class="fw-bold text-primary fs-5">{{ intval($yearTotal['trip_count']) }} chuyến</div>
                     </div>
                     <div class="col-6">
                         <div class="text-muted small">Tiền lương</div>
