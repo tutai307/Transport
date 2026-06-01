@@ -73,34 +73,71 @@
             $totalAmount        = 0;
             $calculatedTripCount = 0;
         @endphp
-        @foreach($trips as $index => $trip)
+        @foreach($allRecords as $index => $item)
             @php
-                $rowAmount           = ($exportType == 'profit') ? $trip->profit : $trip->total_price;
+                if (isset($item->is_adjustment) && $item->is_adjustment) {
+                    $rowAmount           = ($item->type === 'addition') ? $item->amount : -$item->amount;
+                    $rowQty              = 0;
+                } else {
+                    $rowAmount           = ($exportType == 'profit') ? $item->profit : $item->total_price;
+                    $rowQty              = $item->quantity;
+                }
                 $totalAmount        += $rowAmount;
-                $calculatedTripCount += $trip->quantity;
+                $calculatedTripCount += $rowQty;
             @endphp
-            <tr>
-                <td style="border: 1px solid #000000; text-align: center;">{{ $index + 1 }}</td>
-                <td style="border: 1px solid #000000; text-align: center;">{{ $trip->trip_date->format('d/m/Y') }}</td>
-                @if($showProject)
-                    <td style="border: 1px solid #000000;">{{ $trip->project->name }}</td>
-                @endif
-                <td style="border: 1px solid #000000; text-align: center;">{{ $trip->vehicle->plate_number }}</td>
-                <td style="border: 1px solid #000000;">{{ $trip->driver->name }}</td>
-                <td style="border: 1px solid #000000;">{{ $trip->material->name }}</td>
-                <td style="border: 1px solid #000000; text-align: center;">{{ $trip->quantity + 0 }}</td>
+            @if(isset($item->is_adjustment) && $item->is_adjustment)
+                <tr>
+                    <td style="border: 1px solid #000000; text-align: center; background-color: #FFF2CC;">{{ $index + 1 }}</td>
+                    <td style="border: 1px solid #000000; text-align: center; background-color: #FFF2CC;">{{ $item->trip_date->format('d/m/Y') }}</td>
+                    @if($showProject)
+                        <td style="border: 1px solid #000000; background-color: #FFF2CC;">{{ $item->project->name }}</td>
+                    @endif
+                    <td style="border: 1px solid #000000; text-align: center; background-color: #FFF2CC; color: #7f7f7f;">-</td>
+                    <td style="border: 1px solid #000000; background-color: #FFF2CC;">{{ $item->driver->name }}</td>
+                    <td style="border: 1px solid #000000; background-color: #FFF2CC; font-style: italic; font-weight: bold;">
+                        {{ $item->type === 'addition' ? 'Phụ cấp / Chi hộ' : 'Tạm ứng / Khấu trừ' }}
+                    </td>
+                    <td style="border: 1px solid #000000; text-align: center; background-color: #FFF2CC; color: #7f7f7f;">-</td>
 
-                @if($exportType == 'profit')
-                    <td style="border: 1px solid #000000; text-align: right;">{{ intval($trip->buy_price) }}</td>
-                    <td style="border: 1px solid #000000; text-align: right;">{{ intval($trip->sell_price) }}</td>
-                    <td style="border: 1px solid #000000; text-align: right; font-weight: bold;">{{ intval($trip->profit) }}</td>
-                @else
-                    <td style="border: 1px solid #000000; text-align: right;">{{ intval($trip->freight_price) }}</td>
-                    <td style="border: 1px solid #000000; text-align: right; font-weight: bold;">{{ intval($trip->total_price) }}</td>
-                @endif
+                    @if($exportType == 'profit')
+                        <td style="border: 1px solid #000000; text-align: right; background-color: #FFF2CC; color: #7f7f7f;">-</td>
+                        <td style="border: 1px solid #000000; text-align: right; background-color: #FFF2CC; color: #7f7f7f;">-</td>
+                        <td style="border: 1px solid #000000; text-align: right; font-weight: bold; background-color: #FFF2CC; color: {{ $item->type === 'addition' ? '#2e7d32' : '#c62828' }};">
+                            {{ ($item->type === 'addition' ? 1 : -1) * $item->amount }}
+                        </td>
+                    @else
+                        <td style="border: 1px solid #000000; text-align: right; background-color: #FFF2CC; color: #7f7f7f;">-</td>
+                        <td style="border: 1px solid #000000; text-align: right; font-weight: bold; background-color: #FFF2CC; color: {{ $item->type === 'addition' ? '#2e7d32' : '#c62828' }};">
+                            {{ ($item->type === 'addition' ? 1 : -1) * $item->amount }}
+                        </td>
+                    @endif
 
-                <td style="border: 1px solid #000000;">{{ $trip->note }}</td>
-            </tr>
+                    <td style="border: 1px solid #000000; background-color: #FFF2CC;">{{ $item->note }}</td>
+                </tr>
+            @else
+                <tr>
+                    <td style="border: 1px solid #000000; text-align: center;">{{ $index + 1 }}</td>
+                    <td style="border: 1px solid #000000; text-align: center;">{{ $item->trip_date->format('d/m/Y') }}</td>
+                    @if($showProject)
+                        <td style="border: 1px solid #000000;">{{ $item->project->name }}</td>
+                    @endif
+                    <td style="border: 1px solid #000000; text-align: center;">{{ $item->vehicle->plate_number }}</td>
+                    <td style="border: 1px solid #000000;">{{ $item->driver->name }}</td>
+                    <td style="border: 1px solid #000000;">{{ $item->material->name }}</td>
+                    <td style="border: 1px solid #000000; text-align: center;">{{ $item->quantity + 0 }}</td>
+
+                    @if($exportType == 'profit')
+                        <td style="border: 1px solid #000000; text-align: right;">{{ $item->buy_price }}</td>
+                        <td style="border: 1px solid #000000; text-align: right;">{{ $item->sell_price }}</td>
+                        <td style="border: 1px solid #000000; text-align: right; font-weight: bold;">{{ $item->profit }}</td>
+                    @else
+                        <td style="border: 1px solid #000000; text-align: right;">{{ $item->freight_price }}</td>
+                        <td style="border: 1px solid #000000; text-align: right; font-weight: bold;">{{ $item->total_price }}</td>
+                    @endif
+
+                    <td style="border: 1px solid #000000;">{{ $item->note }}</td>
+                </tr>
+            @endif
         @endforeach
     </tbody>
     <tfoot>
@@ -114,7 +151,7 @@
             @else
                 <td style="border: 1px solid #000000; background-color: #FFF2CC;"></td>
             @endif
-            <td style="font-weight: bold; border: 1px solid #000000; text-align: right; background-color: #FFF2CC;">{{ intval($totalAmount) }}</td>
+            <td style="font-weight: bold; border: 1px solid #000000; text-align: right; background-color: #FFF2CC;">{{ $totalAmount }}</td>
             <td style="border: 1px solid #000000; background-color: #FFF2CC;"></td>
         </tr>
         <tr>

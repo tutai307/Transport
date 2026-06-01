@@ -39,7 +39,7 @@
 
 {{-- Tổng kết tháng --}}
 <div class="row g-2 mb-4">
-    <div class="col-6 col-md-6">
+    <div class="col-6 col-md-3">
         <div class="card border-primary h-100">
             <div class="card-body text-center p-2">
                 <small class="text-muted d-block small">Số chuyến</small>
@@ -47,11 +47,27 @@
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-6">
+    <div class="col-6 col-md-3">
         <div class="card border-success h-100">
             <div class="card-body text-center p-2">
-                <small class="text-muted d-block small">Tổng tiền</small>
+                <small class="text-muted d-block small">Tổng tiền vận chuyển</small>
                 <h5 class="text-success mb-0">{{ number_format($summary['total_price'], 0, ',', '.') }}đ</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-info h-100">
+            <div class="card-body text-center p-2">
+                <small class="text-muted d-block small">Phụ cấp phát sinh (+)</small>
+                <h5 class="text-info mb-0">{{ number_format($summary['total_additions'], 0, ',', '.') }}đ</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-danger h-100">
+            <div class="card-body text-center p-2">
+                <small class="text-muted d-block small">Tạm ứng / Khấu trừ (-)</small>
+                <h5 class="text-danger mb-0">{{ number_format($summary['total_deductions'], 0, ',', '.') }}đ</h5>
             </div>
         </div>
     </div>
@@ -76,43 +92,75 @@
             </tr>
         </thead>
         <tbody>
-            @forelse($trips as $i => $trip)
-                <tr>
-                    <td>{{ $i + 1 }}</td>
-                    <td>{{ $trip->trip_date->format('d/m/Y') }}</td>
-                    <td>{{ $trip->vehicle->plate_number }}</td>
-                    <td>{{ $trip->driver->name }}</td>
-                    <td>{{ $trip->material->name }}</td>
-                    <td>{{ $trip->route->full_name }}</td>
-                    <td class="text-end">{{ intval($trip->quantity) }}</td>
-                    <td class="text-end fw-bold">{{ number_format($trip->total_price, 0, ',', '.') }}đ</td>
-                    <td>{{ Str::limit($trip->note, 30) }}</td>
-                    <td>
-                        <div class="d-flex gap-1">
-                            <a href="{{ route('trips.edit', $trip) }}" class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <form method="POST" action="{{ route('trips.destroy', $trip) }}" class="d-inline"
-                                  onsubmit="return confirm('Bạn có chắc muốn xoá chuyến xe này?')">
+            @forelse($allRecords as $i => $item)
+                @if(isset($item->is_adjustment) && $item->is_adjustment)
+                    <tr class="table-warning-subtle">
+                        <td>{{ $i + 1 }}</td>
+                        <td class="text-nowrap">{{ $item->trip_date->format('d/m/Y') }}</td>
+                        <td class="text-muted text-center">-</td>
+                        <td>{{ $item->driver->name }}</td>
+                        <td>
+                            @if($item->type === 'addition')
+                                <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-plus-circle"></i> Phụ cấp / Chi hộ</span>
+                            @else
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle"><i class="bi bi-dash-circle"></i> Tạm ứng / Trừ</span>
+                            @endif
+                        </td>
+                        <td class="text-muted text-center">-</td>
+                        <td class="text-muted text-center">-</td>
+                        <td class="text-end fw-bold {{ $item->type === 'addition' ? 'text-success' : 'text-danger' }}">
+                            {{ $item->type === 'addition' ? '+' : '-' }}{{ number_format($item->amount, 0, ',', '.') }}đ
+                        </td>
+                        <td>{{ Str::limit($item->note, 30) }}</td>
+                        <td>
+                            <form method="POST" action="{{ route('salary-adjustments.destroy', $item) }}" class="d-inline"
+                                  onsubmit="return confirm('Bạn có chắc muốn xoá khoản phát sinh này?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-outline-danger">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
-                        </div>
-                    </td>
-                </tr>
+                        </td>
+                    </tr>
+                @else
+                    <tr>
+                        <td>{{ $i + 1 }}</td>
+                        <td class="text-nowrap">{{ $item->trip_date->format('d/m/Y') }}</td>
+                        <td>{{ $item->vehicle->plate_number }}</td>
+                        <td>{{ $item->driver->name }}</td>
+                        <td>{{ $item->material->name }}</td>
+                        <td>{{ $item->route->full_name }}</td>
+                        <td class="text-end">{{ intval($item->quantity) }}</td>
+                        <td class="text-end fw-bold text-success">{{ number_format($item->total_price, 0, ',', '.') }}đ</td>
+                        <td>{{ Str::limit($item->note, 30) }}</td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a href="{{ route('trips.edit', $item) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form method="POST" action="{{ route('trips.destroy', $item) }}" class="d-inline"
+                                      onsubmit="return confirm('Bạn có chắc muốn xoá chuyến xe này?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                @endif
             @empty
                 <tr>
-                    <td colspan="10" class="text-center text-muted py-4">Chưa có chuyến xe nào.</td>
+                    <td colspan="10" class="text-center text-muted py-4">Chưa có chuyến xe hay khoản phát sinh nào.</td>
                 </tr>
             @endforelse
         </tbody>
-        @if($trips->isNotEmpty())
+        @if($allRecords->isNotEmpty())
         <tfoot class="table-secondary fw-bold">
             <tr>
-                <td colspan="6" class="text-end">Tổng cộng</td>
+                <td colspan="6" class="text-end">Tổng cộng vận chuyển</td>
                 <td class="text-end">{{ intval($summary['total_trips']) }}</td>
                 <td class="text-end text-success">{{ number_format($summary['total_price'], 0, ',', '.') }}đ</td>
                 <td colspan="2"></td>
@@ -124,45 +172,84 @@
 
 {{-- Responsive Cards (Mobile) --}}
 <div class="d-block d-md-none">
-    @forelse($trips as $trip)
-        <div class="card mb-3 shadow-sm border-0 border-start border-4 border-primary">
-            <div class="card-body p-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="fw-bold text-primary">{{ $trip->trip_date->format('d/m/Y') }}</span>
-                    <div class="dropdown">
-                        <button class="btn btn-sm btn-light border" type="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-three-dots-vertical"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{{ route('trips.edit', $trip) }}"><i class="bi bi-pencil text-primary"></i> Sửa</a></li>
-                            <li>
-                                <form method="POST" action="{{ route('trips.destroy', $trip) }}" onsubmit="return confirm('Bạn có chắc muốn xoá?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="dropdown-item text-danger"><i class="bi bi-trash"></i> Xoá</button>
-                                </form>
-                            </li>
-                        </ul>
+    @forelse($allRecords as $item)
+        @if(isset($item->is_adjustment) && $item->is_adjustment)
+            <div class="card mb-3 shadow-sm border-0 border-start border-4 {{ $item->type === 'addition' ? 'border-success' : 'border-danger' }}">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold text-primary">{{ $item->trip_date->format('d/m/Y') }}</span>
+                        <div class="d-flex align-items-center gap-2">
+                            @if($item->type === 'addition')
+                                <span class="badge bg-success-subtle text-success border border-success-subtle">Phụ cấp</span>
+                            @else
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Tạm ứng</span>
+                            @endif
+                            <form method="POST" action="{{ route('salary-adjustments.destroy', $item) }}" onsubmit="return confirm('Bạn có chắc muốn xoá?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </div>
                     </div>
-                </div>
-                <div class="row g-2">
-                    <div class="col-6">
-                        <small class="text-muted d-block">Xe & Vật liệu</small>
-                        <span class="fw-semibold">{{ $trip->vehicle->plate_number }}</span> — {{ $trip->material->name }}
-                    </div>
-                    <div class="col-6 text-end">
-                        <small class="text-muted d-block">Số chuyến</small>
-                        <span class="fw-bold fs-5">{{ intval($trip->quantity) }}</span>
-                    </div>
-                    <div class="col-12 mt-2 pt-2 border-top d-flex justify-content-between align-items-center">
-                        <span class="text-success fw-bold fs-5">{{ number_format($trip->total_price, 0, ',', '.') }} đ</span>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <small class="text-muted d-block">Tài xế</small>
+                            <span class="fw-semibold">{{ $item->driver->name }}</span>
+                        </div>
+                        <div class="col-6 text-end">
+                            <small class="text-muted d-block">Số tiền</small>
+                            <span class="fw-bold {{ $item->type === 'addition' ? 'text-success' : 'text-danger' }}">
+                                {{ $item->type === 'addition' ? '+' : '-' }}{{ number_format($item->amount, 0, ',', '.') }}đ
+                            </span>
+                        </div>
+                        @if($item->note)
+                        <div class="col-12 pt-2 border-top">
+                            <small class="text-muted"><i class="bi bi-info-circle"></i> {{ Str::limit($item->note, 40) }}</small>
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
-        </div>
+        @else
+            <div class="card mb-3 shadow-sm border-0 border-start border-4 border-primary">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold text-primary">{{ $item->trip_date->format('d/m/Y') }}</span>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light border" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{{ route('trips.edit', $item) }}"><i class="bi bi-pencil text-primary"></i> Sửa</a></li>
+                                <li>
+                                    <form method="POST" action="{{ route('trips.destroy', $item) }}" onsubmit="return confirm('Bạn có chắc muốn xoá?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="dropdown-item text-danger"><i class="bi bi-trash"></i> Xoá</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <small class="text-muted d-block">Xe & Vật liệu</small>
+                            <span class="fw-semibold">{{ $item->vehicle->plate_number }}</span> — {{ $item->material->name }}
+                        </div>
+                        <div class="col-6 text-end">
+                            <small class="text-muted d-block">Số chuyến</small>
+                            <span class="fw-bold fs-5">{{ intval($item->quantity) }}</span>
+                        </div>
+                        <div class="col-12 mt-2 pt-2 border-top d-flex justify-content-between align-items-center">
+                            <span class="text-success fw-bold fs-5">{{ number_format($item->total_price, 0, ',', '.') }} đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
     @empty
         <div class="text-center text-muted py-5 card">
-            <div class="card-body">Chưa có chuyến xe nào.</div>
+            <div class="card-body">Chưa có chuyến xe hay khoản phát sinh nào.</div>
         </div>
     @endforelse
 </div>

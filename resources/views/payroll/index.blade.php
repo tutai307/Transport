@@ -43,9 +43,9 @@
                         </div>
                         <div class="col-6">
                             <div class="bg-light rounded p-2">
-                                <div class="text-muted small">Tổng lương</div>
+                                <div class="text-muted small">Thực lĩnh</div>
                                 <div class="fw-bold text-success" style="font-size: 0.95rem;">
-                                    {{ number_format($employee->trips_sum_total_price ?? 0, 0, ',', '.') }}đ
+                                    {{ number_format($employee->net_salary ?? 0, 0, ',', '.') }}đ
                                 </div>
                             </div>
                         </div>

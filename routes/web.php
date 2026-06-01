@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\TripController;
+use App\Http\Controllers\SalaryAdjustmentController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\EmployeeController;
@@ -36,6 +37,10 @@ Route::middleware('auth')->group(function () {
     Route::put('trips/{trip}', [TripController::class, 'update'])->name('trips.update');
     Route::delete('trips/{trip}', [TripController::class, 'destroy'])->name('trips.destroy');
 
+    // Phát sinh lương
+    Route::post('salary-adjustments', [SalaryAdjustmentController::class, 'store'])->name('salary-adjustments.store');
+    Route::delete('salary-adjustments/{salaryAdjustment}', [SalaryAdjustmentController::class, 'destroy'])->name('salary-adjustments.destroy');
+
     // Danh mục
     Route::resource('projects', ProjectController::class)->except(['show', 'destroy']);
     Route::resource('vehicles', VehicleController::class)->except(['show', 'destroy']);
@@ -51,9 +56,9 @@ Route::middleware('auth')->group(function () {
     // Tính lương tài xế
     Route::get('payroll', [PayrollController::class, 'index'])->name('payroll.index');
     Route::get('payroll/driver/{employee}', [PayrollController::class, 'byDriver'])->name('payroll.by-driver');
+    Route::get('payroll/driver/{employee}/export', [PayrollController::class, 'export'])->name('payroll.export');
     Route::get('payroll/driver/{employee}/{year}', [PayrollController::class, 'byYear'])->name('payroll.by-year');
     Route::get('payroll/driver/{employee}/{year}/{month}', [PayrollController::class, 'byMonth'])->name('payroll.by-month');
-    Route::get('payroll/driver/{employee}/export', [PayrollController::class, 'export'])->name('payroll.export');
 
     // API endpoints cho auto-fill (dùng bởi JavaScript)
     Route::get('api/vehicle-volume/{vehicle}', [TripController::class, 'getVehicleVolume'])->name('api.vehicle-volume');

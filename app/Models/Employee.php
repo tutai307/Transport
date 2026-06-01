@@ -20,6 +20,11 @@ class Employee extends Model
         return $this->hasMany(Trip::class, 'driver_id');
     }
 
+    public function salaryAdjustments()
+    {
+        return $this->hasMany(SalaryAdjustment::class, 'driver_id');
+    }
+
     public function scopeActive($query)
     {
         return $query->where('is_active', true);

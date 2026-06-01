@@ -81,14 +81,36 @@ class TripController extends Controller
             ->orderBy('id')
             ->get();
 
+        $adjustments = \App\Models\SalaryAdjustment::with(['driver'])
+            ->where('project_id', $project->id)
+            ->whereYear('trip_date', $year)
+            ->whereMonth('trip_date', $month)
+            ->orderBy('trip_date')
+            ->orderBy('id')
+            ->get();
+
+        foreach ($adjustments as $adj) {
+            $adj->is_adjustment = true;
+            $adj->total_price = $adj->type === 'addition' ? $adj->amount : -$adj->amount;
+        }
+
+        // Gộp hai nguồn dữ liệu
+        $allRecords = $trips->concat($adjustments)->sortBy(function ($item) {
+            $datePrefix = $item->trip_date->format('Ymd');
+            $idSuffix = sprintf('%010d', $item->id);
+            return $datePrefix . $idSuffix;
+        })->values();
+
         $summary = [
             'total_trips' => $trips->sum('quantity'),
             'total_price' => $trips->sum('total_price'),
+            'total_additions' => $adjustments->where('type', 'addition')->sum('amount'),
+            'total_deductions' => $adjustments->where('type', 'deduction')->sum('amount'),
         ];
 
         $monthLabel = "Tháng {$month}/{$year}";
 
-        return view('trips.month', compact('project', 'trips', 'summary', 'year', 'month', 'monthLabel'));
+        return view('trips.month', compact('project', 'allRecords', 'summary', 'year', 'month', 'monthLabel'));
     }
 
     public function create(Request $request)
@@ -99,7 +121,7 @@ class TripController extends Controller
         $materials = Material::active()->orderBy('name')->get();
         $routes = Route::active()->get();
 
-        // --- Fetch recent trips for the table below ---
+        // --- Fetch recent trips and salary adjustments for the table below ---
         $filterMonth = $request->get('filter_month', date('n'));
         $filterYear = $request->get('filter_year', date('Y'));
         $projectId = $request->get('project_id');
@@ -108,14 +130,28 @@ class TripController extends Controller
             ->whereYear('trip_date', $filterYear)
             ->whereMonth('trip_date', $filterMonth);
 
+        $adjQuery = \App\Models\SalaryAdjustment::with(['project', 'driver'])
+            ->whereYear('trip_date', $filterYear)
+            ->whereMonth('trip_date', $filterMonth);
+
         if ($projectId) {
             $query->where('project_id', $projectId);
+            $adjQuery->where('project_id', $projectId);
         }
 
-        $recentTrips = $query->orderBy('trip_date', 'desc')
-            ->orderBy('id', 'desc')
-            ->limit(50)
-            ->get();
+        $trips = $query->get();
+        $adjustments = $adjQuery->get();
+
+        foreach ($adjustments as $adj) {
+            $adj->is_adjustment = true;
+            $adj->total_price = $adj->type === 'addition' ? $adj->amount : -$adj->amount;
+        }
+
+        $recentTrips = $trips->concat($adjustments)->sortByDesc(function ($item) {
+            $datePrefix = $item->trip_date->format('Ymd');
+            $idSuffix = sprintf('%010d', $item->id);
+            return $datePrefix . $idSuffix;
+        })->slice(0, 50)->values();
 
         if ($request->ajax()) {
             return response()->json([

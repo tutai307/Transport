@@ -33,7 +33,7 @@
     <div class="col-6 col-md-3">
         <div class="card border-0 shadow-sm text-center">
             <div class="card-body py-3">
-                <div class="text-muted small mb-1">Tháng có chuyến</div>
+                <div class="text-muted small mb-1">Tháng có hoạt động</div>
                 <div class="fw-bold fs-4 text-primary">{{ $months->count() }}</div>
             </div>
         </div>
@@ -49,8 +49,8 @@
     <div class="col-12 col-md-6">
         <div class="card border-0 shadow-sm text-center" style="background: linear-gradient(45deg, #198754, #20c997);">
             <div class="card-body py-3">
-                <div class="text-white text-opacity-75 small mb-1">Tổng lương cả năm</div>
-                <div class="fw-bold fs-3 text-white">{{ number_format($yearTotal['total_salary'], 0, ',', '.') }}đ</div>
+                <div class="text-white text-opacity-75 small mb-1">Thực lĩnh cả năm</div>
+                <div class="fw-bold fs-3 text-white">{{ number_format($yearTotal['net_salary'], 0, ',', '.') }}đ</div>
             </div>
         </div>
     </div>
@@ -77,8 +77,8 @@
                             <div class="fw-bold text-primary">{{ intval($row->trip_count) }} chuyến</div>
                         </div>
                         <div class="col-5">
-                            <div class="text-muted small">Tiền lương</div>
-                            <div class="fw-bold text-success">{{ number_format($row->total_salary, 0, ',', '.') }}đ</div>
+                            <div class="text-muted small">Thực lĩnh</div>
+                            <div class="fw-bold text-success">{{ number_format($row->net_salary, 0, ',', '.') }}đ</div>
                         </div>
                         <div class="col-2 text-end text-primary">
                             <i class="bi bi-chevron-right"></i>
@@ -108,8 +108,8 @@
                         <div class="fw-bold text-primary fs-5">{{ intval($yearTotal['trip_count']) }} chuyến</div>
                     </div>
                     <div class="col-6">
-                        <div class="text-muted small">Tiền lương</div>
-                        <div class="fw-bold text-success fs-5">{{ number_format($yearTotal['total_salary'], 0, ',', '.') }}đ</div>
+                        <div class="text-muted small">Thực lĩnh</div>
+                        <div class="fw-bold text-success fs-5">{{ number_format($yearTotal['net_salary'], 0, ',', '.') }}đ</div>
                     </div>
                 </div>
             </div>
