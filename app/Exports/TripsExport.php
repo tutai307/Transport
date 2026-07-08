@@ -13,47 +13,41 @@ use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 class TripsExport implements FromView, WithTitle, ShouldAutoSize, WithColumnFormatting
 {
     protected array $filters;
-    protected string $exportType;
 
     public function __construct(array $filters)
     {
         $this->filters = $filters;
-        $this->exportType = $filters['export_type'] ?? 'freight';
     }
 
     public function view(): View
     {
-        $query = Trip::with(['project', 'vehicle', 'driver', 'material', 'route']);
+        $query = Trip::with(['project', 'material', 'route']);
         $adjQuery = \App\Models\SalaryAdjustment::with(['project', 'driver']);
 
-        // Lọc theo dự án
-        if (!empty($this->filters['project_id'])) {
+        if (! empty($this->filters['project_id'])) {
             $query->where('project_id', $this->filters['project_id']);
             $adjQuery->where('project_id', $this->filters['project_id']);
         }
 
-        // Lọc theo tháng/năm
-        if (!empty($this->filters['year']) && !empty($this->filters['month'])) {
+        if (! empty($this->filters['year']) && ! empty($this->filters['month'])) {
             $query->whereYear('trip_date', $this->filters['year'])
-                  ->whereMonth('trip_date', $this->filters['month']);
+                ->whereMonth('trip_date', $this->filters['month']);
             $adjQuery->whereYear('trip_date', $this->filters['year'])
-                     ->whereMonth('trip_date', $this->filters['month']);
-        } elseif (!empty($this->filters['date_from']) || !empty($this->filters['date_to'])) {
+                ->whereMonth('trip_date', $this->filters['month']);
+        } elseif (! empty($this->filters['date_from']) || ! empty($this->filters['date_to'])) {
             $dateFrom = $this->filters['date_from'] ?? now()->startOfMonth()->format('Y-m-d');
             $dateTo = $this->filters['date_to'] ?? now()->format('Y-m-d');
             $query->whereBetween('trip_date', [$dateFrom, $dateTo]);
             $adjQuery->whereBetween('trip_date', [$dateFrom, $dateTo]);
         }
 
-        // Lọc theo xe
-        if (!empty($this->filters['vehicle_id'])) {
+        if (! empty($this->filters['vehicle_id'])) {
             $query->where('vehicle_id', $this->filters['vehicle_id']);
-            // Phát sinh lương không liên quan tới xe, lọc theo xe thì bỏ phát sinh
-            $adjQuery->whereNull('id');
+            // Phát sinh lương không gắn với xe → bỏ hoàn toàn khi lọc theo xe.
+            $adjQuery->whereRaw('1=0');
         }
 
-        // Lọc theo tài xế (phiếu lương)
-        if (!empty($this->filters['driver_id'])) {
+        if (! empty($this->filters['driver_id'])) {
             $query->where('driver_id', $this->filters['driver_id']);
             $adjQuery->where('driver_id', $this->filters['driver_id']);
         }
@@ -66,7 +60,6 @@ class TripsExport implements FromView, WithTitle, ShouldAutoSize, WithColumnForm
             $adj->total_price = $adj->type === 'addition' ? $adj->amount : -$adj->amount;
         }
 
-        // Gộp hai nguồn dữ liệu
         $allRecords = $trips->concat($adjustments)->sortBy(function ($item) {
             $datePrefix = $item->trip_date->format('Ymd');
             $idSuffix = sprintf('%010d', $item->id);
@@ -77,7 +70,6 @@ class TripsExport implements FromView, WithTitle, ShouldAutoSize, WithColumnForm
             'trips' => $trips,
             'allRecords' => $allRecords,
             'filters' => $this->filters,
-            'exportType' => $this->exportType
         ]);
     }
 
@@ -85,14 +77,14 @@ class TripsExport implements FromView, WithTitle, ShouldAutoSize, WithColumnForm
     {
         $title = 'Báo cáo chuyến xe';
 
-        if (!empty($this->filters['project_id'])) {
+        if (! empty($this->filters['project_id'])) {
             $project = Project::find($this->filters['project_id']);
             if ($project) {
                 $title .= ' - ' . $project->name;
             }
         }
 
-        if (!empty($this->filters['year']) && !empty($this->filters['month'])) {
+        if (! empty($this->filters['year']) && ! empty($this->filters['month'])) {
             $title .= ' - T' . $this->filters['month'] . '/' . $this->filters['year'];
         }
 
@@ -102,33 +94,10 @@ class TripsExport implements FromView, WithTitle, ShouldAutoSize, WithColumnForm
     public function columnFormats(): array
     {
         $showProject = empty($this->filters['project_id']) && empty($this->filters['hide_project']);
-        
-        if ($showProject) {
-            if ($this->exportType == 'profit') {
-                return [
-                    'H' => '#,##0',
-                    'I' => '#,##0',
-                    'J' => '#,##0',
-                ];
-            } else {
-                return [
-                    'H' => '#,##0',
-                    'I' => '#,##0',
-                ];
-            }
-        } else {
-            if ($this->exportType == 'profit') {
-                return [
-                    'G' => '#,##0',
-                    'H' => '#,##0',
-                    'I' => '#,##0',
-                ];
-            } else {
-                return [
-                    'G' => '#,##0',
-                    'H' => '#,##0',
-                ];
-            }
-        }
+
+        // 2 cột tiền: đơn giá cước, thành tiền.
+        return $showProject
+            ? ['H' => '#,##0', 'I' => '#,##0']
+            : ['G' => '#,##0', 'H' => '#,##0'];
     }
 }

@@ -115,6 +115,19 @@ php artisan migrate:fresh --seed      # Reset và seed lại database
 npm run build                         # Build assets production
 ```
 
+## Documentation
+
+For developers and maintainers, refer to the docs directory:
+
+- **[Project Overview & PDR](./docs/project-overview-pdr.md)** — Problem statement, users, features, success criteria
+- **[Codebase Summary](./docs/codebase-summary.md)** — Directory structure, models, routes, patterns
+- **[Code Standards](./docs/code-standards.md)** — Conventions, Eloquent patterns, Blade structure, testing
+- **[System Architecture](./docs/system-architecture.md)** — Layered design, request flow, ER diagram, data flows
+- **[Project Roadmap](./docs/project-roadmap.md)** — Migration history, known issues, Q3/Q4 priorities
+- **[Deployment Guide](./docs/deployment-guide.md)** — Local setup, production config, web server setup, troubleshooting
+
+All documentation is in English for clarity; UI remains in Vietnamese.
+
 ## Giấy phép
 
 MIT

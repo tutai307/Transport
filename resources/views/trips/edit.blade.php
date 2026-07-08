@@ -84,9 +84,7 @@
                 <select class="form-select select2" id="material_id" name="material_id" required data-placeholder="-- Chọn vật liệu --">
                     <option value="">-- Chọn vật liệu --</option>
                     @foreach($materials as $material)
-                        <option value="{{ $material->id }}" 
-                                data-price="{{ (int)$material->sell_price }}" 
-                                data-import-price="{{ (int)$material->import_price }}" 
+                        <option value="{{ $material->id }}"
                                 {{ old('material_id', $trip->material_id) == $material->id ? 'selected' : '' }}>
                             {{ $material->name }}
                         </option>
@@ -112,7 +110,7 @@
     </div>
 
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-6">
             <div class="mb-3">
                 <label for="quantity" class="form-label">Số chuyến <span class="text-danger">*</span></label>
                 <input type="number" step="1" class="form-control" id="quantity" name="quantity"
@@ -120,28 +118,12 @@
                 <div class="invalid-feedback">Vui lòng nhập số chuyến (số nguyên dương).</div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-6">
             <div class="mb-3">
                 <label for="freight_price" class="form-label">Giá cước/chuyến <span class="text-danger">*</span></label>
                 <input type="text" class="form-control currency-input" id="freight_price" name="freight_price"
                        value="{{ old('freight_price', number_format($trip->freight_price, 0, '', '')) }}" required>
                 <div class="invalid-feedback">Vui lòng nhập giá cước.</div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="mb-3">
-                <label for="buy_price" class="form-label">Giá mua/chuyến <span class="text-danger">*</span></label>
-                <input type="text" class="form-control currency-input border-warning" id="buy_price" name="buy_price"
-                       value="{{ old('buy_price', number_format($trip->buy_price, 0, '', '')) }}" required>
-                <div class="invalid-feedback">Vui lòng nhập giá mua.</div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="mb-3">
-                <label for="sell_price" class="form-label">Giá bán/chuyến <span class="text-danger">*</span></label>
-                <input type="text" class="form-control currency-input border-info" id="sell_price" name="sell_price"
-                       value="{{ old('sell_price', number_format($trip->sell_price, 0, '', '')) }}" required>
-                <div class="invalid-feedback">Vui lòng nhập giá bán.</div>
             </div>
         </div>
     </div>
@@ -177,8 +159,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('tripForm');
     const quantityInput = document.getElementById('quantity');
     const freightInput = document.getElementById('freight_price');
-    const buyInput = document.getElementById('buy_price');
-    const sellInput = document.getElementById('sell_price');
     const totalDisplay = document.getElementById('total_price_display');
 
     // Bootstrap validation logic
@@ -189,17 +169,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         form.classList.add('was-validated');
     }, false);
-    const vehicleSelect = document.getElementById('vehicle_id');
-    const materialSelect = document.getElementById('material_id');
-
-    // Auto-fill volume khi chọn xe
-    $('#vehicle_id').on('select2:select', function(e) {
-        const selected = e.params.data.element;
-        if (selected.dataset.volume) {
-            volumeInput.value = selected.dataset.volume;
-            calculateTotal();
-        }
-    });
 
     function calculateTotal() {
         const quantity = parseFloat(quantityInput.value) || 0;
@@ -210,28 +179,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     quantityInput.addEventListener('input', calculateTotal);
     freightInput.addEventListener('input', calculateTotal);
-    buyInput.addEventListener('input', calculateTotal);
-    sellInput.addEventListener('input', calculateTotal);
 
     // Initial calculation
     calculateTotal();
-
-    // Auto-fill giá khi chọn vật liệu
-    $('#material_id').on('select2:select', function(e) {
-        const selected = e.params.data.element;
-        if (selected.dataset.price) {
-            sellInput.value = selected.dataset.price;
-        }
-        if (selected.dataset.importPrice) {
-            buyInput.value = selected.dataset.importPrice;
-        }
-        // Format lại giá tiền
-        if (typeof formatCurrency === 'function') {
-            formatCurrency(sellInput);
-            formatCurrency(buyInput);
-        }
-        calculateTotal();
-    });
 
     // Auto-clear số 0 khi focus vào số chuyến
     quantityInput.addEventListener('focus', function() {
@@ -240,9 +190,6 @@ document.addEventListener('DOMContentLoaded', function() {
     quantityInput.addEventListener('blur', function() {
         if (this.value === '') this.value = '0';
     });
-
-    // Initial calculation
-    calculateTotal();
 });
 </script>
 @endpush

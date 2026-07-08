@@ -11,9 +11,7 @@ class ProjectController extends Controller
     public function index()
     {
         $projects = Project::withSum('trips', 'quantity')
-            ->addSelect(['trips_profit' => Trip::selectRaw('SUM((sell_price - buy_price - freight_price) * quantity)')
-                ->whereColumn('project_id', 'projects.id')
-            ])
+            ->withSum('trips', 'total_price')
             ->orderBy('is_active', 'desc')
             ->orderBy('name')
             ->get();

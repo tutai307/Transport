@@ -6,7 +6,20 @@
       "Bash(curl -s \"https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.js\")",
       "Bash(php -l app/Http/Controllers/TripController.php)",
       "Bash(php -l app/Http/Controllers/PayrollController.php)",
-      "Bash(php -l app/Exports/TripsExport.php)"
+      "Bash(php -l app/Exports/TripsExport.php)",
+      "Bash(rtk ls *)",
+      "Bash(rtk read *)",
+      "Bash(git check-ignore *)",
+      "Bash(rtk git *)",
+      "Bash(rtk wc *)",
+      "Bash(mysql --version)",
+      "Bash(mysqladmin -uroot ping)",
+      "Bash(mysql -uroot -e \"CREATE DATABASE IF NOT EXISTS transport CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\")",
+      "Bash(mysql -uroot -e \"SHOW DATABASES LIKE 'transport';\")",
+      "Bash(mysql -uroot transport -e \"DESCRIBE trips;\")",
+      "Bash(mysql -uroot transport -e \"DESCRIBE vehicles;\")",
+      "Bash(mysql -uroot transport -e \"DESCRIBE materials;\")",
+      "Bash(rtk grep *)"
     ]
   }
 }

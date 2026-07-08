@@ -10,15 +10,14 @@ class Trip extends Model
         'trip_date',
         'project_id',
         'vehicle_id',
+        'vehicle_plate_snapshot',
         'driver_id',
+        'driver_name_snapshot',
         'material_id',
         'route_id',
         'quantity',
         'freight_price',
-        'sell_price',
         'total_price',
-        'buy_price',
-        'profit',
         'note',
     ];
 
@@ -28,10 +27,7 @@ class Trip extends Model
             'trip_date' => 'date',
             'quantity' => 'decimal:2',
             'freight_price' => 'decimal:2',
-            'sell_price' => 'decimal:2',
             'total_price' => 'decimal:2',
-            'buy_price' => 'decimal:2',
-            'profit' => 'decimal:2',
         ];
     }
 

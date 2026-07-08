@@ -36,7 +36,7 @@ class ReportController extends Controller
 
     public function export(Request $request)
     {
-        $filters = array_merge($request->all(), ['export_type' => 'freight']);
+        $filters = $request->all();
 
         $dateFrom = $request->input('date_from', now()->startOfMonth()->format('Y-m-d'));
         $dateTo   = $request->input('date_to', now()->format('Y-m-d'));

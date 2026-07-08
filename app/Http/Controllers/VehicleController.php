@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Employee;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
 
@@ -9,20 +10,27 @@ class VehicleController extends Controller
 {
     public function index()
     {
-        $vehicles = Vehicle::withCount('trips')->orderBy('is_active', 'desc')->orderBy('plate_number')->get();
+        $vehicles = Vehicle::with('defaultDriver')
+            ->withCount('trips')
+            ->orderBy('is_active', 'desc')
+            ->orderBy('plate_number')
+            ->get();
 
         return view('vehicles.index', compact('vehicles'));
     }
 
     public function create()
     {
-        return view('vehicles.create');
+        $drivers = Employee::active()->orderBy('name')->get();
+
+        return view('vehicles.create', compact('drivers'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'plate_number' => 'required|string|max:20',
+            'default_driver_id' => 'nullable|exists:employees,id',
         ]);
 
         Vehicle::create($validated);
@@ -32,13 +40,16 @@ class VehicleController extends Controller
 
     public function edit(Vehicle $vehicle)
     {
-        return view('vehicles.edit', compact('vehicle'));
+        $drivers = Employee::active()->orderBy('name')->get();
+
+        return view('vehicles.edit', compact('vehicle', 'drivers'));
     }
 
     public function update(Request $request, Vehicle $vehicle)
     {
         $validated = $request->validate([
             'plate_number' => 'required|string|max:20',
+            'default_driver_id' => 'nullable|exists:employees,id',
             'is_active' => 'boolean',
         ]);
 

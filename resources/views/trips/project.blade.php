@@ -15,19 +15,9 @@
         </div>
         <div class="col-12 col-md-auto">
             <div class="d-flex gap-2">
-                <div class="btn-group">
-                    <button type="button" class="btn btn-success btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-file-earmark-excel"></i> Xuất Excel
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="{{ route('reports.export', ['project_id' => $project->id, 'export_type' => 'freight']) }}">
-                            <i class="bi bi-currency-dollar"></i> Xuất theo giá cước
-                        </a></li>
-                        <li><a class="dropdown-item" href="{{ route('reports.export', ['project_id' => $project->id, 'export_type' => 'profit']) }}">
-                            <i class="bi bi-graph-up"></i> Xuất theo lợi nhuận
-                        </a></li>
-                    </ul>
-                </div>
+                <a href="{{ route('reports.export', ['project_id' => $project->id]) }}" class="btn btn-success btn-sm">
+                    <i class="bi bi-file-earmark-excel"></i> Xuất Excel
+                </a>
                 <a href="{{ route('trips.create', ['project_id' => $project->id]) }}" class="btn btn-primary btn-sm flex-fill flex-md-grow-0">
                     <i class="bi bi-plus-circle"></i> Thêm chuyến
                 </a>
@@ -95,13 +85,9 @@
                     </div>
                     <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
                         <div class="d-flex gap-1">
-                            <a href="{{ route('reports.export', ['project_id' => $project->id, 'year' => $m->year, 'month' => $m->month, 'export_type' => 'freight']) }}" 
+                            <a href="{{ route('reports.export', ['project_id' => $project->id, 'year' => $m->year, 'month' => $m->month]) }}"
                                class="btn btn-sm btn-outline-success" title="Xuất Cước tháng này">
                                 <i class="bi bi-file-earmark-excel"></i> Cước
-                            </a>
-                            <a href="{{ route('reports.export', ['project_id' => $project->id, 'year' => $m->year, 'month' => $m->month, 'export_type' => 'profit']) }}" 
-                               class="btn btn-sm btn-outline-warning" title="Xuất Lợi Nhuận tháng này">
-                                <i class="bi bi-file-earmark-excel"></i> Lãi
                             </a>
                         </div>
                         <span class="text-primary">Xem chi tiết <i class="bi bi-chevron-right"></i></span>

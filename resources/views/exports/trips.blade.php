@@ -1,8 +1,7 @@
 @php
     $showProject = empty($filters['project_id']) && empty($filters['hide_project']);
-    $totalCols   = $showProject
-        ? ($exportType == 'profit' ? 11 : 10)
-        : ($exportType == 'profit' ? 10 : 9);
+    // Cột: STT, Ngày, [Dự án], Biển số, Tài xế, Vật liệu, Số chuyến, Đơn giá, Thành tiền, Ghi chú
+    $totalCols   = $showProject ? 10 : 9;
     $leftCols    = $showProject ? 6 : 5;
 @endphp
 <table>
@@ -26,7 +25,7 @@
         {{-- Title --}}
         <tr>
             <td colspan="{{ $totalCols }}" style="font-weight: bold; font-size: 16px; text-align: center; text-transform: uppercase;">
-                {{ !empty($filters['driver_id']) ? 'PHIẾU TÍNH LƯƠNG TÀI XẾ' : 'BÁO CÁO TỔNG HỢP CHUYẾN XE VẬN CHUYỂN (' . ($exportType == 'profit' ? 'LỢI NHUẬN' : 'CƯỚC PHÍ') . ')' }}
+                {{ !empty($filters['driver_id']) ? 'PHIẾU TÍNH LƯƠNG TÀI XẾ' : 'BÁO CÁO TỔNG HỢP CHUYẾN XE VẬN CHUYỂN (CƯỚC PHÍ)' }}
             </td>
         </tr>
         <tr>
@@ -57,14 +56,8 @@
             <th style="font-weight: bold; border: 1px solid #000000; text-align: center; background-color: #E2EFDA;">Tài xế</th>
             <th style="font-weight: bold; border: 1px solid #000000; text-align: center; background-color: #E2EFDA;">Loại vật liệu</th>
             <th style="font-weight: bold; border: 1px solid #000000; text-align: center; background-color: #E2EFDA;">Số chuyến</th>
-            @if($exportType == 'profit')
-                <th style="font-weight: bold; border: 1px solid #000000; text-align: center; background-color: #E2EFDA;">Giá mua</th>
-                <th style="font-weight: bold; border: 1px solid #000000; text-align: center; background-color: #E2EFDA;">Giá bán</th>
-                <th style="font-weight: bold; border: 1px solid #000000; text-align: center; background-color: #E2EFDA;">Lợi nhuận</th>
-            @else
-                <th style="font-weight: bold; border: 1px solid #000000; text-align: center; background-color: #E2EFDA;">Đơn giá</th>
-                <th style="font-weight: bold; border: 1px solid #000000; text-align: center; background-color: #E2EFDA;">Thành tiền</th>
-            @endif
+            <th style="font-weight: bold; border: 1px solid #000000; text-align: center; background-color: #E2EFDA;">Đơn giá</th>
+            <th style="font-weight: bold; border: 1px solid #000000; text-align: center; background-color: #E2EFDA;">Thành tiền</th>
             <th style="font-weight: bold; border: 1px solid #000000; text-align: center; background-color: #E2EFDA;">Ghi chú</th>
         </tr>
     </thead>
@@ -76,13 +69,13 @@
         @foreach($allRecords as $index => $item)
             @php
                 if (isset($item->is_adjustment) && $item->is_adjustment) {
-                    $rowAmount           = ($item->type === 'addition') ? $item->amount : -$item->amount;
-                    $rowQty              = 0;
+                    $rowAmount = ($item->type === 'addition') ? $item->amount : -$item->amount;
+                    $rowQty    = 0;
                 } else {
-                    $rowAmount           = ($exportType == 'profit') ? $item->profit : $item->total_price;
-                    $rowQty              = $item->quantity;
+                    $rowAmount = $item->total_price;
+                    $rowQty    = $item->quantity;
                 }
-                $totalAmount        += $rowAmount;
+                $totalAmount         += $rowAmount;
                 $calculatedTripCount += $rowQty;
             @endphp
             @if(isset($item->is_adjustment) && $item->is_adjustment)
@@ -98,20 +91,10 @@
                         {{ $item->type === 'addition' ? 'Phụ cấp / Chi hộ' : 'Tạm ứng / Khấu trừ' }}
                     </td>
                     <td style="border: 1px solid #000000; text-align: center; background-color: #FFF2CC; color: #7f7f7f;">-</td>
-
-                    @if($exportType == 'profit')
-                        <td style="border: 1px solid #000000; text-align: right; background-color: #FFF2CC; color: #7f7f7f;">-</td>
-                        <td style="border: 1px solid #000000; text-align: right; background-color: #FFF2CC; color: #7f7f7f;">-</td>
-                        <td style="border: 1px solid #000000; text-align: right; font-weight: bold; background-color: #FFF2CC; color: {{ $item->type === 'addition' ? '#2e7d32' : '#c62828' }};">
-                            {{ ($item->type === 'addition' ? 1 : -1) * $item->amount }}
-                        </td>
-                    @else
-                        <td style="border: 1px solid #000000; text-align: right; background-color: #FFF2CC; color: #7f7f7f;">-</td>
-                        <td style="border: 1px solid #000000; text-align: right; font-weight: bold; background-color: #FFF2CC; color: {{ $item->type === 'addition' ? '#2e7d32' : '#c62828' }};">
-                            {{ ($item->type === 'addition' ? 1 : -1) * $item->amount }}
-                        </td>
-                    @endif
-
+                    <td style="border: 1px solid #000000; text-align: right; background-color: #FFF2CC; color: #7f7f7f;">-</td>
+                    <td style="border: 1px solid #000000; text-align: right; font-weight: bold; background-color: #FFF2CC; color: {{ $item->type === 'addition' ? '#2e7d32' : '#c62828' }};">
+                        {{ ($item->type === 'addition' ? 1 : -1) * $item->amount }}
+                    </td>
                     <td style="border: 1px solid #000000; background-color: #FFF2CC;">{{ $item->note }}</td>
                 </tr>
             @else
@@ -121,20 +104,12 @@
                     @if($showProject)
                         <td style="border: 1px solid #000000;">{{ $item->project->name }}</td>
                     @endif
-                    <td style="border: 1px solid #000000; text-align: center;">{{ $item->vehicle->plate_number }}</td>
-                    <td style="border: 1px solid #000000;">{{ $item->driver->name }}</td>
-                    <td style="border: 1px solid #000000;">{{ $item->material->name }}</td>
+                    <td style="border: 1px solid #000000; text-align: center;">{{ $item->vehicle_plate_snapshot ?? '—' }}</td>
+                    <td style="border: 1px solid #000000;">{{ $item->driver_name_snapshot ?? '—' }}</td>
+                    <td style="border: 1px solid #000000;">{{ optional($item->material)->name }}</td>
                     <td style="border: 1px solid #000000; text-align: center;">{{ $item->quantity + 0 }}</td>
-
-                    @if($exportType == 'profit')
-                        <td style="border: 1px solid #000000; text-align: right;">{{ $item->buy_price }}</td>
-                        <td style="border: 1px solid #000000; text-align: right;">{{ $item->sell_price }}</td>
-                        <td style="border: 1px solid #000000; text-align: right; font-weight: bold;">{{ $item->profit }}</td>
-                    @else
-                        <td style="border: 1px solid #000000; text-align: right;">{{ $item->freight_price }}</td>
-                        <td style="border: 1px solid #000000; text-align: right; font-weight: bold;">{{ $item->total_price }}</td>
-                    @endif
-
+                    <td style="border: 1px solid #000000; text-align: right;">{{ $item->freight_price }}</td>
+                    <td style="border: 1px solid #000000; text-align: right; font-weight: bold;">{{ $item->total_price }}</td>
                     <td style="border: 1px solid #000000;">{{ $item->note }}</td>
                 </tr>
             @endif
@@ -145,12 +120,7 @@
         <tr>
             <td colspan="{{ $leftCols }}" style="font-weight: bold; border: 1px solid #000000; text-align: right; background-color: #FFF2CC;">TỔNG CỘNG</td>
             <td style="font-weight: bold; border: 1px solid #000000; text-align: center; background-color: #FFF2CC;">{{ $calculatedTripCount + 0 }}</td>
-            @if($exportType == 'profit')
-                <td style="border: 1px solid #000000; background-color: #FFF2CC;"></td>
-                <td style="border: 1px solid #000000; background-color: #FFF2CC;"></td>
-            @else
-                <td style="border: 1px solid #000000; background-color: #FFF2CC;"></td>
-            @endif
+            <td style="border: 1px solid #000000; background-color: #FFF2CC;"></td>
             <td style="font-weight: bold; border: 1px solid #000000; text-align: right; background-color: #FFF2CC;">{{ $totalAmount }}</td>
             <td style="border: 1px solid #000000; background-color: #FFF2CC;"></td>
         </tr>

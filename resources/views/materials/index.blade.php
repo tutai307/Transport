@@ -16,8 +16,6 @@
                 <th>#</th>
                 <th>Mã VL</th>
                 <th>Tên vật liệu</th>
-                <th>Giá nhập</th>
-                <th>Giá bán</th>
                 <th>Số chuyến</th>
                 <th>Trạng thái</th>
                 <th style="width:80px">Sửa</th>
@@ -29,8 +27,6 @@
                     <td>{{ $i + 1 }}</td>
                     <td><span class="badge bg-light text-dark border">{{ $material->code }}</span></td>
                     <td class="fw-bold">{{ $material->name }}</td>
-                    <td class="text-end">{{ number_format($material->import_price) }}</td>
-                    <td class="text-end text-success fw-bold">{{ number_format($material->sell_price) }}</td>
                     <td>{{ $material->trips_count }}</td>
                     <td>
                         @if($material->is_active)

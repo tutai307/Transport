@@ -6,14 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Material extends Model
 {
-    protected $fillable = ['name', 'code', 'import_price', 'sell_price', 'is_active'];
+    protected $fillable = ['name', 'code', 'is_active'];
 
     protected function casts(): array
     {
         return [
             'is_active' => 'boolean',
-            'import_price' => 'decimal:2',
-            'sell_price' => 'decimal:2',
         ];
     }
 

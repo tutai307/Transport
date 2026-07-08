@@ -70,36 +70,98 @@ class TripController extends Controller
         ));
     }
 
-    // Xem chi tiết chuyến xe trong 1 tháng của 1 dự án
+    // Lịch tháng: mỗi ngày = 1 card (số chuyến + tổng tiền + số phát sinh).
     public function byMonth(Project $project, int $year, int $month)
     {
-        $trips = Trip::with(['vehicle', 'driver', 'material', 'route'])
-            ->where('project_id', $project->id)
+        try {
+            $firstOfMonth = Carbon::create($year, $month, 1);
+        } catch (\Throwable) {
+            abort(404);
+        }
+        $daysInMonth = $firstOfMonth->daysInMonth;
+        // dayOfWeekIso: Mon=1..Sun=7 → dùng để chèn cell trống đầu tháng.
+        $leadingBlanks = $firstOfMonth->dayOfWeekIso - 1;
+
+        // Aggregate in PHP để tránh phụ thuộc DAY()/strftime() giữa MySQL và SQLite.
+        $tripRows = Trip::where('project_id', $project->id)
             ->whereYear('trip_date', $year)
             ->whereMonth('trip_date', $month)
-            ->orderBy('trip_date')
+            ->get(['trip_date', 'quantity', 'total_price']);
+
+        $adjRows = \App\Models\SalaryAdjustment::where('project_id', $project->id)
+            ->whereYear('trip_date', $year)
+            ->whereMonth('trip_date', $month)
+            ->get(['trip_date']);
+
+        $tripsByDay = $tripRows->groupBy(fn ($t) => (int) $t->trip_date->day);
+        $adjustmentsByDay = $adjRows->groupBy(fn ($a) => (int) $a->trip_date->day);
+
+        $days = [];
+        for ($d = 1; $d <= $daysInMonth; $d++) {
+            $dayTrips = $tripsByDay->get($d, collect());
+            $days[] = [
+                'day' => $d,
+                'trip_count' => (int) $dayTrips->sum('quantity'),
+                'total_price' => (float) $dayTrips->sum('total_price'),
+                'adj_count' => (int) $adjustmentsByDay->get($d, collect())->count(),
+            ];
+        }
+
+        $summary = [
+            'total_trips' => array_sum(array_column($days, 'trip_count')),
+            'total_price' => array_sum(array_column($days, 'total_price')),
+            'total_adj_count' => array_sum(array_column($days, 'adj_count')),
+        ];
+
+        $monthLabel = "Tháng {$month}/{$year}";
+
+        return view('trips.month', compact(
+            'project', 'days', 'leadingBlanks', 'daysInMonth',
+            'summary', 'year', 'month', 'monthLabel'
+        ));
+    }
+
+    // Chi tiết 1 ngày: danh sách chuyến + gom nhóm theo Xe (snapshot) + theo Vật liệu.
+    public function byDay(Project $project, int $year, int $month, int $day)
+    {
+        try {
+            $date = Carbon::create($year, $month, $day);
+        } catch (\Throwable) {
+            abort(404);
+        }
+
+        $trips = Trip::with(['material', 'route', 'driver', 'vehicle'])
+            ->where('project_id', $project->id)
+            ->whereDate('trip_date', $date)
             ->orderBy('id')
             ->get();
 
         $adjustments = \App\Models\SalaryAdjustment::with(['driver'])
             ->where('project_id', $project->id)
-            ->whereYear('trip_date', $year)
-            ->whereMonth('trip_date', $month)
-            ->orderBy('trip_date')
+            ->whereDate('trip_date', $date)
             ->orderBy('id')
             ->get();
 
-        foreach ($adjustments as $adj) {
-            $adj->is_adjustment = true;
-            $adj->total_price = $adj->type === 'addition' ? $adj->amount : -$adj->amount;
-        }
+        // Gom theo snapshot biển số + tên tài xế (đúng lịch sử: đổi tài xế mặc định
+        // sau này không thay đổi phân nhóm quá khứ).
+        $byVehicle = $trips->groupBy(fn ($t) => ($t->vehicle_plate_snapshot ?? '—') . '|' . ($t->driver_name_snapshot ?? '—'))
+            ->map(fn ($g) => [
+                'plate' => $g->first()->vehicle_plate_snapshot ?? '—',
+                'driver_name' => $g->first()->driver_name_snapshot ?? '—',
+                'trip_count' => $g->sum('quantity'),
+                'total_price' => $g->sum('total_price'),
+            ])
+            ->sortByDesc('trip_count')
+            ->values();
 
-        // Gộp hai nguồn dữ liệu
-        $allRecords = $trips->concat($adjustments)->sortBy(function ($item) {
-            $datePrefix = $item->trip_date->format('Ymd');
-            $idSuffix = sprintf('%010d', $item->id);
-            return $datePrefix . $idSuffix;
-        })->values();
+        $byMaterial = $trips->groupBy('material_id')
+            ->map(fn ($g) => [
+                'material' => optional($g->first()->material)->name ?? '—',
+                'trip_count' => $g->sum('quantity'),
+                'total_price' => $g->sum('total_price'),
+            ])
+            ->sortByDesc('trip_count')
+            ->values();
 
         $summary = [
             'total_trips' => $trips->sum('quantity'),
@@ -108,9 +170,12 @@ class TripController extends Controller
             'total_deductions' => $adjustments->where('type', 'deduction')->sum('amount'),
         ];
 
-        $monthLabel = "Tháng {$month}/{$year}";
+        $dayLabel = $date->format('d/m/Y');
 
-        return view('trips.month', compact('project', 'allRecords', 'summary', 'year', 'month', 'monthLabel'));
+        return view('trips.day', compact(
+            'project', 'year', 'month', 'day', 'dayLabel',
+            'trips', 'adjustments', 'byVehicle', 'byMaterial', 'summary'
+        ));
     }
 
     public function create(Request $request)
@@ -168,10 +233,7 @@ class TripController extends Controller
 
     public function store(Request $request)
     {
-        // Loại bỏ dấu chấm phân cách hàng nghìn khỏi các trường giá tiền
         if ($request->has('freight_price')) $request->merge(['freight_price' => str_replace('.', '', $request->freight_price)]);
-        if ($request->has('sell_price')) $request->merge(['sell_price' => str_replace('.', '', $request->sell_price)]);
-        if ($request->has('buy_price')) $request->merge(['buy_price' => str_replace('.', '', $request->buy_price)]);
 
         $validated = $request->validate([
             'trip_date' => 'required|date',
@@ -182,13 +244,12 @@ class TripController extends Controller
             'route_id' => 'required|exists:routes,id',
             'quantity' => 'required|integer|min:1',
             'freight_price' => 'required|numeric|min:0',
-            'sell_price' => 'required|numeric|min:0',
-            'buy_price' => 'required|numeric|min:0',
             'note' => 'nullable|string',
         ]);
 
         $validated['total_price'] = $validated['quantity'] * $validated['freight_price'];
-        $validated['profit'] = ($validated['sell_price'] - $validated['buy_price'] - $validated['freight_price']) * $validated['quantity'];
+        $validated['driver_name_snapshot'] = Employee::find($validated['driver_id'])?->name;
+        $validated['vehicle_plate_snapshot'] = Vehicle::find($validated['vehicle_id'])?->plate_number;
 
         Trip::create($validated);
 
@@ -202,8 +263,6 @@ class TripController extends Controller
                 'material_id' => $validated['material_id'],
                 'route_id' => $validated['route_id'],
                 'freight_price' => $validated['freight_price'],
-                'buy_price' => $validated['buy_price'],
-                'sell_price' => $validated['sell_price'],
             ])->with('success', 'Đã lưu chuyến xe. Tiếp tục thêm mới.');
         }
 
@@ -214,6 +273,17 @@ class TripController extends Controller
             'year' => $date->year,
             'month' => $date->month,
         ])->with('success', 'Đã thêm chuyến xe thành công.');
+    }
+
+    // API: khi chọn xe trong form nhập chuyến, trả về tài xế mặc định của xe.
+    public function getVehicleDefaultDriver(Vehicle $vehicle)
+    {
+        $driver = $vehicle->defaultDriver;
+
+        return response()->json([
+            'driver_id' => $driver?->id,
+            'driver_name' => $driver?->name,
+        ]);
     }
 
     public function edit(Trip $trip)
@@ -229,10 +299,7 @@ class TripController extends Controller
 
     public function update(Request $request, Trip $trip)
     {
-        // Loại bỏ dấu chấm phân cách hàng nghìn khỏi các trường giá tiền
         if ($request->has('freight_price')) $request->merge(['freight_price' => str_replace('.', '', $request->freight_price)]);
-        if ($request->has('sell_price')) $request->merge(['sell_price' => str_replace('.', '', $request->sell_price)]);
-        if ($request->has('buy_price')) $request->merge(['buy_price' => str_replace('.', '', $request->buy_price)]);
 
         $validated = $request->validate([
             'trip_date' => 'required|date',
@@ -243,13 +310,12 @@ class TripController extends Controller
             'route_id' => 'required|exists:routes,id',
             'quantity' => 'required|integer|min:1',
             'freight_price' => 'required|numeric|min:0',
-            'sell_price' => 'required|numeric|min:0',
-            'buy_price' => 'required|numeric|min:0',
             'note' => 'nullable|string',
         ]);
 
         $validated['total_price'] = $validated['quantity'] * $validated['freight_price'];
-        $validated['profit'] = ($validated['sell_price'] - $validated['buy_price'] - $validated['freight_price']) * $validated['quantity'];
+        $validated['driver_name_snapshot'] = Employee::find($validated['driver_id'])?->name;
+        $validated['vehicle_plate_snapshot'] = Vehicle::find($validated['vehicle_id'])?->plate_number;
 
         $trip->update($validated);
 

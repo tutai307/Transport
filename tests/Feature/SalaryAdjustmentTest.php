@@ -26,14 +26,12 @@ class SalaryAdjustmentTest extends TestCase
         $this->driver = Employee::create([
             'name' => 'Driver A',
             'phone' => '0987654321',
-            'role' => 'driver',
             'is_active' => true,
         ]);
 
         $this->project = Project::create([
             'name' => 'Project A',
-            'client_name' => 'Client A',
-            'start_date' => '2026-06-01',
+            'description' => 'Test project',
             'is_active' => true,
         ]);
     }

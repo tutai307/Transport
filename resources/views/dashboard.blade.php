@@ -15,7 +15,7 @@
 
 {{-- Chỉ số tổng quan --}}
 <div class="row g-3 mb-4">
-    <div class="col-md-4">
+    <div class="col-md-6">
         <div class="card border-0 shadow-sm">
             <div class="card-body">
                 <div class="d-flex align-items-center">
@@ -23,14 +23,14 @@
                         <i class="bi bi-truck fs-3"></i>
                     </div>
                     <div class="flex-grow-1 ms-3">
-                        <h6 class="text-muted mb-1">Số chuyến</h6>
+                        <h6 class="text-muted mb-1">Tổng số chuyến</h6>
                         <h3 class="mb-0">{{ intval($totalTrips) }}</h3>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-6">
         <div class="card border-0 shadow-sm text-white" style="background: linear-gradient(45deg, #0d6efd, #0dcaf0);">
             <div class="card-body">
                 <div class="d-flex align-items-center">
@@ -45,21 +45,6 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm text-white" style="background: linear-gradient(45deg, #198754, #20c997);">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="flex-shrink-0 bg-white bg-opacity-25 p-3 rounded-3">
-                        <i class="bi bi-graph-up-arrow fs-3"></i>
-                    </div>
-                    <div class="flex-grow-1 ms-3">
-                        <h6 class="text-white text-opacity-75 mb-1">Tổng lợi nhuận</h6>
-                        <h3 class="mb-0">{{ number_format($totalProfit) }} đ</h3>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <div class="row g-3">
@@ -67,7 +52,7 @@
     <div class="col-lg-8">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-header py-3 border-0">
-                <h6 class="mb-0 fw-bold">Doanh thu & Lợi nhuận (6 tháng gần nhất)</h6>
+                <h6 class="mb-0 fw-bold">Doanh thu (6 tháng gần nhất)</h6>
             </div>
             <div class="card-body">
                 <div id="trendChart"></div>
@@ -97,9 +82,6 @@ document.addEventListener('DOMContentLoaded', function() {
         series: [{
             name: 'Doanh thu',
             data: @json($chartRevenue)
-        }, {
-            name: 'Lợi nhuận',
-            data: @json($chartProfit)
         }],
         chart: {
             id: 'trendChart',
@@ -107,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
             height: 350,
             toolbar: { show: false }
         },
-        colors: ['#0d6efd', '#198754'],
+        colors: ['#0d6efd'],
         dataLabels: { enabled: false },
         stroke: { curve: 'smooth', width: 3 },
         xaxis: {

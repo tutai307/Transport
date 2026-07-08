@@ -22,3 +22,11 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# ClaudeKit (ck)
+/.claude
+/.agent
+/.repomixignore
+/release-manifest.json
+/plans
+/docs

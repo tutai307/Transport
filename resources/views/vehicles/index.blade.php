@@ -15,6 +15,7 @@
             <tr>
                 <th>#</th>
                 <th>Biển số</th>
+                <th>Tài xế mặc định</th>
                 <th>Số chuyến</th>
                 <th>Trạng thái</th>
                 <th style="width:80px">Sửa</th>
@@ -25,6 +26,7 @@
                 <tr class="{{ !$vehicle->is_active ? 'table-secondary' : '' }}">
                     <td>{{ $i + 1 }}</td>
                     <td class="fw-bold">{{ $vehicle->plate_number }}</td>
+                    <td>{{ $vehicle->defaultDriver?->name ?? '—' }}</td>
                     <td>{{ $vehicle->trips_count }}</td>
                     <td>
                         @if($vehicle->is_active)

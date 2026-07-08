@@ -31,6 +31,7 @@ Route::middleware('auth')->group(function () {
     Route::get('trips', [TripController::class, 'index'])->name('trips.index');
     Route::get('trips/project/{project}', [TripController::class, 'byProject'])->name('trips.by-project');
     Route::get('trips/project/{project}/{year}/{month}', [TripController::class, 'byMonth'])->name('trips.by-month');
+    Route::get('trips/project/{project}/{year}/{month}/{day}', [TripController::class, 'byDay'])->name('trips.by-day');
     Route::get('trips/create', [TripController::class, 'create'])->name('trips.create');
     Route::post('trips', [TripController::class, 'store'])->name('trips.store');
     Route::get('trips/{trip}/edit', [TripController::class, 'edit'])->name('trips.edit');
@@ -61,7 +62,7 @@ Route::middleware('auth')->group(function () {
     Route::get('payroll/driver/{employee}/{year}/{month}', [PayrollController::class, 'byMonth'])->name('payroll.by-month');
 
     // API endpoints cho auto-fill (dùng bởi JavaScript)
-    Route::get('api/vehicle-volume/{vehicle}', [TripController::class, 'getVehicleVolume'])->name('api.vehicle-volume');
+    Route::get('api/vehicles/{vehicle}/default-driver', [TripController::class, 'getVehicleDefaultDriver'])->name('api.vehicle-default-driver');
     Route::post('api/routes/quick-create', [RouteController::class, 'quickStore'])->name('api.routes.quick-create');
 
     // Profile (từ Breeze)

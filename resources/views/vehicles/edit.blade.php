@@ -25,6 +25,20 @@
         <div class="invalid-feedback">Vui lòng nhập biển số xe.</div>
     </div>
 
+    <div class="mb-3">
+        <label for="default_driver_id" class="form-label">Tài xế mặc định</label>
+        <select class="form-select select2" id="default_driver_id" name="default_driver_id" data-placeholder="-- Chọn tài xế --">
+            <option value=""></option>
+            @foreach($drivers as $driver)
+                <option value="{{ $driver->id }}"
+                    {{ old('default_driver_id', $vehicle->default_driver_id) == $driver->id ? 'selected' : '' }}>
+                    {{ $driver->name }}
+                </option>
+            @endforeach
+        </select>
+        <small class="text-muted">Khi chọn xe này lúc nhập chuyến, tài xế sẽ được tự động điền.</small>
+    </div>
+
     <div class="mb-3 form-check form-switch">
         <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1"
                {{ old('is_active', $vehicle->is_active) ? 'checked' : '' }}>

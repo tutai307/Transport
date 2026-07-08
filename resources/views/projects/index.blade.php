@@ -17,7 +17,7 @@
                 <th>Tên dự án</th>
                 <th>Mô tả</th>
                 <th>Số chuyến</th>
-                <th>Tạm tính lãi</th>
+                <th>Tổng cước</th>
                 <th>Trạng thái</th>
                 <th style="width:80px">Sửa</th>
             </tr>
@@ -29,7 +29,7 @@
                     <td class="fw-bold">{{ $project->name }}</td>
                     <td>{{ Str::limit($project->description, 50) }}</td>
                     <td>{{ intval($project->trips_sum_quantity ?? 0) }}</td>
-                    <td class="text-success fw-bold">{{ number_format($project->trips_profit ?? 0, 0, ',', '.') }} đ</td>
+                    <td class="text-success fw-bold">{{ number_format($project->trips_sum_total_price ?? 0, 0, ',', '.') }} đ</td>
                     <td>
                         @if($project->is_active)
                             <span class="badge bg-success">Đang hoạt động</span>

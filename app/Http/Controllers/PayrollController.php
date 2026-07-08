@@ -186,7 +186,6 @@ class PayrollController extends Controller
             'driver_id'    => $employee->id,
             'date_from'    => $dateFrom,
             'date_to'      => $dateTo,
-            'export_type'  => 'freight',
             'hide_project' => true,
         ];
 
