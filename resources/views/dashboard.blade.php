@@ -38,7 +38,7 @@
                         <i class="bi bi-currency-dollar fs-3"></i>
                     </div>
                     <div class="flex-grow-1 ms-3">
-                        <h6 class="text-white text-opacity-75 mb-1">Tổng giá cước</h6>
+                        <h6 class="text-white text-opacity-75 mb-1">Tổng tiền cước</h6>
                         <h3 class="mb-0">{{ number_format($totalFreightAmount) }} đ</h3>
                     </div>
                 </div>
@@ -48,11 +48,11 @@
 </div>
 
 <div class="row g-3">
-    {{-- Biểu đồ xu hướng --}}
+    {{-- Biểu đồ xu hướng tiền cước --}}
     <div class="col-lg-8">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-header py-3 border-0">
-                <h6 class="mb-0 fw-bold">Doanh thu (6 tháng gần nhất)</h6>
+                <h6 class="mb-0 fw-bold">Tiền cước & Số chuyến (6 tháng gần nhất)</h6>
             </div>
             <div class="card-body">
                 <div id="trendChart"></div>
@@ -60,11 +60,11 @@
         </div>
     </div>
 
-    {{-- Biểu đồ cơ cấu dự án --}}
+    {{-- Biểu đồ số chuyến xe theo dự án --}}
     <div class="col-lg-4">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-header py-3 border-0">
-                <h6 class="mb-0 fw-bold">Tỷ trọng doanh thu theo Dự án</h6>
+                <h6 class="mb-0 fw-bold">Số chuyến xe theo Dự án</h6>
             </div>
             <div class="card-body">
                 <div id="projectChart"></div>
@@ -77,40 +77,67 @@
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. Biểu đồ xu hướng
+    // 1. Biểu đồ xu hướng tiền cước + số chuyến
     var trendOptions = {
-        series: [{
-            name: 'Doanh thu',
-            data: @json($chartRevenue)
-        }],
+        series: [
+            {
+                name: 'Tiền cước (đ)',
+                type: 'area',
+                data: @json($chartFreight)
+            },
+            {
+                name: 'Số chuyến',
+                type: 'line',
+                data: @json($chartTrips)
+            }
+        ],
         chart: {
             id: 'trendChart',
-            type: 'area',
+            type: 'line',
             height: 350,
             toolbar: { show: false }
         },
-        colors: ['#0d6efd'],
+        colors: ['#0d6efd', '#20c997'],
         dataLabels: { enabled: false },
-        stroke: { curve: 'smooth', width: 3 },
+        stroke: { curve: 'smooth', width: [3, 2] },
         xaxis: {
             categories: @json($chartMonths),
         },
-        yaxis: {
-            labels: {
-                formatter: function (value) {
-                    return new Intl.NumberFormat('vi-VN').format(value);
+        yaxis: [
+            {
+                title: { text: 'Tiền cước (đ)' },
+                labels: {
+                    formatter: function (value) {
+                        return new Intl.NumberFormat('vi-VN').format(value);
+                    }
+                }
+            },
+            {
+                opposite: true,
+                title: { text: 'Số chuyến' },
+                labels: {
+                    formatter: function (value) {
+                        return value;
+                    }
                 }
             }
-        },
+        ],
         tooltip: {
-            y: {
-                formatter: function (value) {
-                    return new Intl.NumberFormat('vi-VN').format(value) + " đ";
+            y: [
+                {
+                    formatter: function (value) {
+                        return new Intl.NumberFormat('vi-VN').format(value) + " đ";
+                    }
+                },
+                {
+                    formatter: function (value) {
+                        return value + " chuyến";
+                    }
                 }
-            }
+            ]
         },
         fill: {
-            type: 'gradient',
+            type: ['gradient', 'solid'],
             gradient: {
                 shadeIntensity: 1,
                 opacityFrom: 0.45,
@@ -121,9 +148,9 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     new ApexCharts(document.querySelector("#trendChart"), trendOptions).render();
 
-    // 2. Biểu đồ dự án
+    // 2. Biểu đồ số chuyến xe theo dự án
     var projectOptions = {
-        series: @json($projectRevenue),
+        series: @json($projectTrips),
         chart: {
             id: 'projectChart',
             type: 'donut',
@@ -137,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function() {
         tooltip: {
             y: {
                 formatter: function (value) {
-                    return new Intl.NumberFormat('vi-VN').format(value) + " đ";
+                    return value + " chuyến";
                 }
             }
         }
@@ -150,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const themeConfig = {
             theme: { mode: isDark ? 'dark' : 'light' }
         };
-        
+
         ApexCharts.exec('trendChart', 'updateOptions', themeConfig);
         ApexCharts.exec('projectChart', 'updateOptions', themeConfig);
     });

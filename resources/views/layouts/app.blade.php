@@ -101,6 +101,20 @@
         [data-bs-theme="dark"] .flatpickr-day.today { border-color: var(--sidebar-hover-bg); }
         [data-bs-theme="dark"] .flatpickr-day.selected { background: var(--sidebar-hover-bg); border-color: var(--sidebar-hover-bg); }
 
+        /* === Breadcrumb responsive === */
+        .breadcrumb { font-size: 14px; flex-wrap: nowrap; overflow: hidden; }
+        .breadcrumb-item { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+        .breadcrumb-item.active { color: var(--text-color); }
+
+        @media (max-width: 767px) {
+            .breadcrumb { font-size: 13px; }
+            /* Ẩn tất cả item trừ 2 cuối */
+            .breadcrumb-item:not(:nth-last-child(-n+2)) { display: none; }
+            /* Item thứ 2 từ cuối: đổi separator thành mũi tên quay lại */
+            .breadcrumb-item:nth-last-child(2)::before { content: "← " !important; }
+            .breadcrumb-item { max-width: 55vw; }
+        }
+
         /* === UX tối ưu cho người dùng lớn tuổi === */
         body { font-size: 16px; background: var(--body-bg); color: var(--text-color); transition: background 0.3s, color 0.3s; }
         .navbar { font-size: 17px; background: var(--nav-bg) !important; }
@@ -284,6 +298,9 @@
                 <a class="nav-link {{ request()->routeIs('trips.*') ? 'active' : '' }}" href="{{ route('trips.index') }}">
                     <i class="bi bi-card-list"></i> Chuyến xe
                 </a>
+                <a class="nav-link {{ request()->routeIs('attendance.*') ? 'active' : '' }}" href="{{ route('attendance.index') }}">
+                    <i class="bi bi-calendar-check"></i> Chấm công
+                </a>
                 <a class="nav-link {{ request()->routeIs('projects.*') ? 'active' : '' }}" href="{{ route('projects.index') }}">
                     <i class="bi bi-building"></i> Dự án
                 </a>
@@ -315,13 +332,6 @@
                         <i class="bi bi-signpost-2"></i> Tuyến đường
                     </a>
                 </div>
-                <div class="mt-auto px-3 py-4 text-center">
-                    <hr class="mx-0 mb-3 opacity-25">
-                    <div class="small text-muted opacity-75" style="font-size: 11px; line-height: 1.4;">
-                        <i class="bi bi-heart-fill text-danger"></i> Sản phẩm được tài trợ bởi <br>
-                        <strong class="text-primary">Nguyễn Ngọc Tú Tài</strong>
-                    </div>
-                </div>
             </nav>
         </div>
 
@@ -351,9 +361,12 @@
         <a href="{{ route('trips.index') }}" class="{{ request()->routeIs('trips.*') ? 'active' : '' }}">
             <i class="bi bi-card-list"></i> Chuyến xe
         </a>
+        <a href="{{ route('attendance.index') }}" class="{{ request()->routeIs('attendance.*') ? 'active' : '' }}">
+            <i class="bi bi-calendar-check"></i> Chấm công
+        </a>
         {{-- Nút Thêm gỡ bỏ theo yêu cầu người dùng --}}
         <a href="{{ route('reports.index') }}" class="{{ request()->routeIs('reports.*') ? 'active' : '' }}">
-            <i class="bi bi-file-earmark-invoice"></i> Hoá đơn
+            <i class="bi bi-file-earmark-spreadsheet"></i> Hoá đơn
         </a>
         <a href="{{ route('payroll.index') }}" class="{{ request()->routeIs('payroll.*') ? 'active' : '' }}">
             <i class="bi bi-wallet2"></i> Lương

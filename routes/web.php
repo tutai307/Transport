@@ -12,6 +12,7 @@ use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SettingsController;
 
@@ -26,6 +27,15 @@ Route::get('/', function () {
 // Tất cả route yêu cầu đăng nhập
 Route::middleware('auth')->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Chấm công
+    Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');
+    Route::post('attendance/commit', [AttendanceController::class, 'commit'])->name('attendance.commit');
+    Route::post('api/attendance/mark', [AttendanceController::class, 'mark'])->name('api.attendance.mark');
+    Route::post('api/attendance/unmark', [AttendanceController::class, 'unmark'])->name('api.attendance.unmark');
+    Route::patch('api/attendance/config', [AttendanceController::class, 'updateConfig'])->name('api.attendance.config');
+    Route::get('api/attendance/details', [AttendanceController::class, 'details'])->name('api.attendance.details');
+    Route::get('api/attendance/pending', [AttendanceController::class, 'pending'])->name('api.attendance.pending');
 
     // Chuyến xe — luồng: Dự án → Tháng → Chi tiết
     Route::get('trips', [TripController::class, 'index'])->name('trips.index');

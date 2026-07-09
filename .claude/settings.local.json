@@ -19,7 +19,10 @@
       "Bash(mysql -uroot transport -e \"DESCRIBE trips;\")",
       "Bash(mysql -uroot transport -e \"DESCRIBE vehicles;\")",
       "Bash(mysql -uroot transport -e \"DESCRIBE materials;\")",
-      "Bash(rtk grep *)"
+      "Bash(rtk grep *)",
+      "Bash(php -l app/Http/Controllers/AttendanceController.php)",
+      "Bash(php -l app/Models/AttendanceMark.php)",
+      "Bash(php -r \"echo 'OK';\")"
     ]
   }
 }
