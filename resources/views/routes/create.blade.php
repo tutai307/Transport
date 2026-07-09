@@ -37,6 +37,12 @@
                value="{{ old('distance_km') }}">
     </div>
 
+    <div class="mb-3">
+        <label for="price" class="form-label">Giá cước</label>
+        <input type="text" class="form-control currency-input" id="price" name="price"
+               value="{{ old('price', 0) }}">
+    </div>
+
     <div class="d-flex gap-2">
         <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Lưu</button>
         <a href="{{ route('routes.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Quay lại</a>

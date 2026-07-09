@@ -17,6 +17,7 @@
                 <th>Điểm đi</th>
                 <th>Điểm đến</th>
                 <th>Khoảng cách (km)</th>
+                <th>Giá cước</th>
                 <th>Số chuyến</th>
                 <th>Trạng thái</th>
                 <th style="width:80px">Sửa</th>
@@ -29,6 +30,7 @@
                     <td class="fw-bold">{{ $route->from_location }}</td>
                     <td class="fw-bold">{{ $route->to_location }}</td>
                     <td>{{ $route->distance_km ? number_format($route->distance_km, 1) : '—' }}</td>
+                    <td>{{ number_format($route->price, 0, ',', '.') }}đ</td>
                     <td>{{ $route->trips_count }}</td>
                     <td>
                         @if($route->is_active)

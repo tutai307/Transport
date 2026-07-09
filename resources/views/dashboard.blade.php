@@ -47,6 +47,53 @@
     </div>
 </div>
 
+@if($tripsWithoutDriverCount > 0)
+<div class="card border-0 shadow-sm mb-4 border-start border-4 border-warning">
+    <div class="card-body">
+        <div class="d-flex align-items-start">
+            <div class="flex-shrink-0 bg-warning-subtle text-warning p-3 rounded-3">
+                <i class="bi bi-person-x fs-3"></i>
+            </div>
+            <div class="flex-grow-1 ms-3">
+                <h6 class="mb-1 fw-bold">
+                    Có {{ $tripsWithoutDriverCount }} chuyến xe chưa gán tài xế
+                </h6>
+                <p class="text-muted small mb-2">Bổ sung tài xế để đảm bảo tính lương và đối soát đầy đủ.</p>
+                <div class="table-responsive">
+                    <table class="table table-sm table-borderless align-middle mb-0">
+                        <thead>
+                            <tr class="text-muted small">
+                                <th>Ngày</th>
+                                <th>Dự án</th>
+                                <th>Xe</th>
+                                <th style="width:60px"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($tripsWithoutDriver as $trip)
+                                <tr>
+                                    <td class="text-nowrap">{{ $trip->trip_date->format('d/m/Y') }}</td>
+                                    <td>{{ optional($trip->project)->name ?? '—' }}</td>
+                                    <td>{{ $trip->vehicle_plate_snapshot ?? optional($trip->vehicle)->plate_number ?? '—' }}</td>
+                                    <td class="text-end">
+                                        <a href="{{ route('trips.edit', $trip) }}" class="btn btn-sm btn-outline-warning" title="Bổ sung tài xế">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                @if($tripsWithoutDriverCount > $tripsWithoutDriver->count())
+                    <small class="text-muted">Và {{ $tripsWithoutDriverCount - $tripsWithoutDriver->count() }} chuyến khác...</small>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
 <div class="row g-3">
     {{-- Biểu đồ xu hướng tiền cước --}}
     <div class="col-lg-8">

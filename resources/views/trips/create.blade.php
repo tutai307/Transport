@@ -81,30 +81,35 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label for="vehicle_id" class="form-label">Xe <span class="text-danger">*</span></label>
-                        <select class="form-select select2" id="vehicle_id" name="vehicle_id" required data-placeholder="-- Chọn xe --">
-                            <option value="">-- Chọn xe --</option>
-                            @foreach($vehicles as $vehicle)
-                                <option value="{{ $vehicle->id }}"
-                                        {{ old('vehicle_id', request('vehicle_id')) == $vehicle->id ? 'selected' : '' }}>
-                                    {{ $vehicle->plate_number }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <div class="d-flex align-items-center gap-2">
+                            <select class="form-select select2" id="vehicle_id" name="vehicle_id" required data-placeholder="-- Chọn xe --">
+                                <option value="">-- Chọn xe --</option>
+                                @foreach($vehicles as $vehicle)
+                                    <option value="{{ $vehicle->id }}"
+                                            {{ old('vehicle_id', request('vehicle_id')) == $vehicle->id ? 'selected' : '' }}>
+                                        {{ $vehicle->plate_number }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <button type="button" class="btn btn-outline-primary text-nowrap" data-bs-toggle="modal" data-bs-target="#quickAddVehicleModal" title="Thêm xe mới">
+                                <i class="bi bi-plus-lg"></i>
+                            </button>
+                        </div>
                         <div class="invalid-feedback">Vui lòng chọn xe.</div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="mb-3">
-                        <label for="driver_id" class="form-label">Tài xế <span class="text-danger">*</span></label>
-                        <select class="form-select select2" id="driver_id" name="driver_id" required data-placeholder="-- Chọn tài xế --">
-                            <option value="">-- Chọn tài xế --</option>
+                        <label for="driver_id" class="form-label">Tài xế</label>
+                        <select class="form-select select2" id="driver_id" name="driver_id" data-placeholder="-- Chưa xác định tài xế --">
+                            <option value="">-- Chưa xác định tài xế --</option>
                             @foreach($employees as $employee)
                                 <option value="{{ $employee->id }}" {{ old('driver_id', request('driver_id')) == $employee->id ? 'selected' : '' }}>
                                     {{ $employee->name }}
                                 </option>
                             @endforeach
                         </select>
-                        <div class="invalid-feedback">Vui lòng chọn tài xế.</div>
+                        <div class="form-text">Có thể bỏ trống nếu xe mới chưa biết tài xế — bổ sung sau.</div>
                     </div>
                 </div>
             </div>
@@ -127,16 +132,22 @@
                 </div>
                 <div class="col-md-6">
                     <div class="mb-3">
-                        <label for="route_id" class="form-label">Tuyến đường <span class="text-danger">*</span></label>
-                        <select class="form-select select2" id="route_id" name="route_id" required data-placeholder="-- Chọn tuyến --">
-                            <option value="">-- Chọn tuyến --</option>
-                            @foreach($routes as $route)
-                                <option value="{{ $route->id }}" {{ old('route_id', request('route_id')) == $route->id ? 'selected' : '' }}>
-                                    {{ $route->from_location }} → {{ $route->to_location }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <div class="invalid-feedback">Vui lòng chọn tuyến đường.</div>
+                        <label for="route_id" class="form-label">Cung chặng <span class="text-danger">*</span></label>
+                        <div class="d-flex align-items-center gap-2">
+                            <select class="form-select select2" id="route_id" name="route_id" required data-placeholder="-- Chọn cung chặng --">
+                                <option value="">-- Chọn cung chặng --</option>
+                                @if($selectedRoute)
+                                    <option value="{{ $selectedRoute->id }}" data-price="{{ (int) $selectedRoute->price }}" selected>
+                                        {{ $selectedRoute->from_location }} → {{ $selectedRoute->to_location }}
+                                    </option>
+                                @endif
+                            </select>
+                            <button type="button" class="btn btn-outline-primary text-nowrap" data-bs-toggle="modal" data-bs-target="#routePriceModal">
+                                <i class="bi bi-signpost-split"></i> Danh sách cung chặng
+                            </button>
+                        </div>
+                        <div class="invalid-feedback">Vui lòng chọn cung chặng.</div>
+                        <div class="form-text">Bấm "Danh sách cung chặng" để chọn các cung chặng sẽ dùng cho ngày này, sau đó chọn 1 cung chặng ở ô trên.</div>
                     </div>
                 </div>
             </div>
@@ -294,20 +305,8 @@
 <hr class="my-5">
 
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-3">
-    <h5 class="mb-0 text-primary" id="recent-trips-title"><i class="bi bi-calendar-event"></i> Các chuyến xe đã nhập (Tháng {{ $filterMonth }}/{{ $filterYear }})</h5>
-    <div class="d-flex align-items-center gap-2">
-        <label class="text-muted small mb-0">Xem tháng khác:</label>
-        <select id="filter_month" class="form-select form-select-sm w-auto">
-            @for($m = 1; $m <= 12; $m++)
-                <option value="{{ $m }}" {{ $filterMonth == $m ? 'selected' : '' }}>Tháng {{ $m }}</option>
-            @endfor
-        </select>
-        <select id="filter_year" class="form-select form-select-sm w-auto">
-            @for($y = date('Y') - 2; $y <= date('Y') + 1; $y++)
-                <option value="{{ $y }}" {{ $filterYear == $y ? 'selected' : '' }}>Năm {{ $y }}</option>
-            @endfor
-        </select>
-    </div>
+    <h5 class="mb-0 text-primary" id="recent-trips-title"><i class="bi bi-calendar-event"></i> Các chuyến xe đã nhập (Ngày {{ \Carbon\Carbon::parse($filterDate)->format('d/m/Y') }})</h5>
+    <small class="text-muted">Danh sách tự cập nhật theo ngày đang chọn ở form phía trên.</small>
 </div>
 
 <div class="table-responsive d-none d-md-block">
@@ -337,7 +336,8 @@
     @include('trips.partials.recent_trips_cards', ['recentTrips' => $recentTrips])
 </div>
 
-@include('trips.partials.route_create_modal')
+@include('trips.partials.route_price_modal')
+@include('trips.partials.vehicle_create_modal')
 
 <!-- Modal Xác nhận Xóa Phát Sinh Lương -->
 <div class="modal fade" id="deleteAdjustmentModal" tabindex="-1" aria-labelledby="deleteAdjustmentModalLabel" aria-hidden="true">
@@ -377,6 +377,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         form.classList.add('was-validated');
     }, false);
+
+    // Auto-fill giá cước khi người dùng chọn 1 cung chặng ở select (giá lấy từ danh sách đã chọn trong modal)
+    $('#route_id').on('select2:select', function() {
+        const price = $(this).find(':selected').data('price');
+        if (price !== undefined && price !== '') {
+            freightInput.value = String(price);
+            freightInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    });
 
     // Tính thành tiền (Số lượng x Giá cước)
     function calculateTotal() {
@@ -423,29 +432,35 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial calculation
     calculateTotal();
 
-    // --- AJAX Filter logic ---
-    const monthSelect = document.getElementById('filter_month');
-    const yearSelect = document.getElementById('filter_year');
+    // --- AJAX Filter logic (theo ngày đang chọn ở form, không phải theo tháng) ---
     const projectSelect = document.getElementById('project_id_select');
     const tableBody = document.getElementById('recent-trips-body');
     const tableTitle = document.getElementById('recent-trips-title');
     const pageMainTitle = document.getElementById('page-main-title');
 
+    function currentFilterDate() {
+        return tripDateEl.value || '{{ date('Y-m-d') }}';
+    }
+
+    function formatDateVn(dateStr) {
+        const parts = dateStr.split('-');
+        return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : dateStr;
+    }
+
     function updateRecentTrips() {
-        const month = monthSelect.value;
-        const year = yearSelect.value;
-        const projectId = projectSelect.value; 
-        
+        const filterDate = currentFilterDate();
+        const projectId = projectSelect.value;
+
         // Show loading state
         tableBody.style.opacity = '0.5';
         const mobileContainer = document.getElementById('recent-trips-mobile');
         if (mobileContainer) mobileContainer.style.opacity = '0.5';
-        
-        let url = `{{ route('trips.create') }}?filter_month=${month}&filter_year=${year}`;
+
+        let url = `{{ route('trips.create') }}?filter_date=${filterDate}`;
         if (projectId) {
             url += `&project_id=${projectId}`;
         }
-        
+
         fetch(url, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
@@ -455,14 +470,14 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             tableBody.innerHTML = data.html;
             if (mobileContainer) mobileContainer.innerHTML = data.cards;
-            
+
             tableBody.style.opacity = '1';
             if (mobileContainer) mobileContainer.style.opacity = '1';
-            
+
             // Get project name
             const projectName = projectId ? projectSelect.options[projectSelect.selectedIndex].text : 'Tất cả dự án';
-            tableTitle.innerHTML = `<i class="bi bi-calendar-event"></i> Chuyến xe - ${projectName} (Tháng ${month}/${year})`;
-            
+            tableTitle.innerHTML = `<i class="bi bi-calendar-event"></i> Chuyến xe - ${projectName} (Ngày ${formatDateVn(filterDate)})`;
+
             // Update page main title
             if (projectId) {
                 pageMainTitle.innerHTML = `<i class="bi bi-plus-circle"></i> Thêm chuyến xe: ${projectName}`;
@@ -476,35 +491,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    monthSelect.addEventListener('change', updateRecentTrips);
-    yearSelect.addEventListener('change', updateRecentTrips);
-
-    // Khi đổi ngày → tự sync tháng/năm xuống bảng bên dưới
+    // Khi đổi ngày → tự cập nhật bảng bên dưới theo ngày đó
     // Dùng Flatpickr instance vì altInput:true làm sự kiện "change" không đáng tin
-    function syncMonthFromDate(dateStr) {
-        if (!dateStr) return;
-        const parts = dateStr.split('-');
-        if (parts.length < 2) return;
-        const newYear  = parseInt(parts[0]);
-        const newMonth = parseInt(parts[1]);
-        if (String(monthSelect.value) !== String(newMonth) || String(yearSelect.value) !== String(newYear)) {
-            monthSelect.value = newMonth;
-            yearSelect.value  = newYear;
-            updateRecentTrips();
-        }
-    }
-
     const tripDateEl = document.getElementById('trip_date');
     const fpInstance = tripDateEl && tripDateEl._flatpickr;
     if (fpInstance) {
-        fpInstance.config.onChange.push(function(selectedDates, dateStr) {
-            syncMonthFromDate(dateStr);
+        fpInstance.config.onChange.push(function() {
+            updateRecentTrips();
         });
     } else {
         // Fallback nếu Flatpickr chưa init (không dùng altInput)
-        tripDateEl.addEventListener('change', function() {
-            syncMonthFromDate(this.value);
-        });
+        tripDateEl.addEventListener('change', updateRecentTrips);
     }
 
     // Listen for project change (using jQuery for Select2 compatibility)

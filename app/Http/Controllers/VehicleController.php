@@ -38,6 +38,27 @@ class VehicleController extends Controller
         return redirect()->route('vehicles.index')->with('success', 'Đã thêm xe.');
     }
 
+    // AJAX: thêm xe nhanh từ modal trong form nhập chuyến xe.
+    public function quickStore(Request $request)
+    {
+        $validated = $request->validate([
+            'plate_number' => 'required|string|max:20',
+            'default_driver_id' => 'nullable|exists:employees,id',
+        ]);
+
+        $vehicle = Vehicle::create([
+            'plate_number' => trim($validated['plate_number']),
+            'default_driver_id' => $validated['default_driver_id'] ?? null,
+            'is_active' => true,
+        ]);
+
+        return response()->json([
+            'id' => $vehicle->id,
+            'plate_number' => $vehicle->plate_number,
+            'default_driver_id' => $vehicle->default_driver_id,
+        ]);
+    }
+
     public function edit(Vehicle $vehicle)
     {
         $drivers = Employee::active()->orderBy('name')->get();

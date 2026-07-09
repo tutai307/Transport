@@ -6,12 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Route extends Model
 {
-    protected $fillable = ['from_location', 'to_location', 'distance_km', 'is_active'];
+    protected $fillable = ['from_location', 'to_location', 'distance_km', 'price', 'is_active'];
 
     protected function casts(): array
     {
         return [
             'distance_km' => 'decimal:2',
+            'price' => 'decimal:2',
             'is_active' => 'boolean',
         ];
     }

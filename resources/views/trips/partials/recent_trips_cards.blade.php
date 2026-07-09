@@ -60,7 +60,7 @@
         <div class="row g-2">
             <div class="col-6">
                 <small class="text-muted d-block">Tài xế</small>
-                <span class="fw-semibold">{{ $trip->driver->name }}</span>
+                <span class="fw-semibold">{{ $trip->driver_name_snapshot ?? optional($trip->driver)->name ?? '—' }}</span>
             </div>
             <div class="col-6">
                 <small class="text-muted d-block">Vật liệu</small>
@@ -93,6 +93,6 @@
 @endif
 @empty
 <div class="text-center text-muted py-4 card">
-    <div class="card-body">Không có chuyến xe hay khoản phát sinh nào trong tháng này.</div>
+    <div class="card-body">Không có chuyến xe hay khoản phát sinh nào trong ngày này.</div>
 </div>
 @endforelse

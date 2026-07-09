@@ -50,10 +50,20 @@ class DashboardController extends Controller
             $projectTrips[] = (int) $stat->total_trips;
         }
 
+        // 4. Cảnh báo: chuyến xe chưa gán tài xế
+        $tripsWithoutDriverCount = Trip::whereNull('driver_id')->count();
+        $tripsWithoutDriver = Trip::with(['project', 'vehicle'])
+            ->whereNull('driver_id')
+            ->orderByDesc('trip_date')
+            ->orderByDesc('id')
+            ->limit(10)
+            ->get();
+
         return view('dashboard', compact(
             'totalTrips', 'totalFreightAmount',
             'chartMonths', 'chartFreight', 'chartTrips',
-            'projectNames', 'projectTrips'
+            'projectNames', 'projectTrips',
+            'tripsWithoutDriverCount', 'tripsWithoutDriver'
         ));
     }
 }

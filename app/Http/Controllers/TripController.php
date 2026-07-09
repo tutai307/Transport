@@ -163,6 +163,22 @@ class TripController extends Controller
             ->sortByDesc('trip_count')
             ->values();
 
+        $byRoute = $trips->groupBy('route_id')
+            ->map(function ($g) {
+                $route = $g->first()->route;
+                $label = $route
+                    ? ($route->from_location . ' → ' . $route->to_location)
+                    : '—';
+
+                return [
+                    'route' => $label,
+                    'trip_count' => $g->sum('quantity'),
+                    'total_price' => $g->sum('total_price'),
+                ];
+            })
+            ->sortByDesc('trip_count')
+            ->values();
+
         $summary = [
             'total_trips' => $trips->sum('quantity'),
             'total_price' => $trips->sum('total_price'),
@@ -174,7 +190,7 @@ class TripController extends Controller
 
         return view('trips.day', compact(
             'project', 'year', 'month', 'day', 'dayLabel',
-            'trips', 'adjustments', 'byVehicle', 'byMaterial', 'summary'
+            'trips', 'adjustments', 'byVehicle', 'byMaterial', 'byRoute', 'summary'
         ));
     }
 
@@ -186,18 +202,18 @@ class TripController extends Controller
         $materials = Material::active()->orderBy('name')->get();
         $routes = Route::active()->get();
 
-        // --- Fetch recent trips and salary adjustments for the table below ---
-        $filterMonth = $request->get('filter_month', date('n'));
-        $filterYear = $request->get('filter_year', date('Y'));
+        $selectedRouteId = old('route_id', $request->get('route_id'));
+        $selectedRoute = $selectedRouteId ? Route::find($selectedRouteId) : null;
+
+        // --- Fetch trips and salary adjustments của ngày đang nhập cho bảng bên dưới ---
+        $filterDate = $request->get('filter_date', $request->get('trip_date', date('Y-m-d')));
         $projectId = $request->get('project_id');
 
         $query = Trip::with(['project', 'vehicle', 'driver', 'material', 'route'])
-            ->whereYear('trip_date', $filterYear)
-            ->whereMonth('trip_date', $filterMonth);
+            ->whereDate('trip_date', $filterDate);
 
         $adjQuery = \App\Models\SalaryAdjustment::with(['project', 'driver'])
-            ->whereYear('trip_date', $filterYear)
-            ->whereMonth('trip_date', $filterMonth);
+            ->whereDate('trip_date', $filterDate);
 
         if ($projectId) {
             $query->where('project_id', $projectId);
@@ -213,10 +229,8 @@ class TripController extends Controller
         }
 
         $recentTrips = $trips->concat($adjustments)->sortByDesc(function ($item) {
-            $datePrefix = $item->trip_date->format('Ymd');
-            $idSuffix = sprintf('%010d', $item->id);
-            return $datePrefix . $idSuffix;
-        })->slice(0, 50)->values();
+            return sprintf('%010d', $item->id);
+        })->values();
 
         if ($request->ajax()) {
             return response()->json([
@@ -226,8 +240,8 @@ class TripController extends Controller
         }
 
         return view('trips.create', compact(
-            'projects', 'vehicles', 'employees', 'materials', 'routes',
-            'recentTrips', 'filterMonth', 'filterYear'
+            'projects', 'vehicles', 'employees', 'materials', 'routes', 'selectedRoute',
+            'recentTrips', 'filterDate'
         ));
     }
 
@@ -239,7 +253,7 @@ class TripController extends Controller
             'trip_date' => 'required|date',
             'project_id' => 'required|exists:projects,id',
             'vehicle_id' => 'required|exists:vehicles,id',
-            'driver_id' => 'required|exists:employees,id',
+            'driver_id' => 'nullable|exists:employees,id',
             'material_id' => 'required|exists:materials,id',
             'route_id' => 'required|exists:routes,id',
             'quantity' => 'required|integer|min:1',
@@ -305,7 +319,7 @@ class TripController extends Controller
             'trip_date' => 'required|date',
             'project_id' => 'required|exists:projects,id',
             'vehicle_id' => 'required|exists:vehicles,id',
-            'driver_id' => 'required|exists:employees,id',
+            'driver_id' => 'nullable|exists:employees,id',
             'material_id' => 'required|exists:materials,id',
             'route_id' => 'required|exists:routes,id',
             'quantity' => 'required|integer|min:1',

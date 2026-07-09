@@ -32,7 +32,7 @@
         <tr>
             <td class="text-nowrap">{{ $trip->trip_date->format('d/m/Y') }}</td>
             <td>{{ $trip->vehicle->plate_number }}</td>
-            <td>{{ $trip->driver->name }}</td>
+            <td>{{ $trip->driver_name_snapshot ?? optional($trip->driver)->name ?? '—' }}</td>
             <td>{{ $trip->material->name }}</td>
             <td class="small">{{ $trip->route->from_location }} → {{ $trip->route->to_location }}</td>
             <td class="text-end">{{ $trip->quantity + 0 }}</td>
@@ -55,6 +55,6 @@
     @endif
 @empty
     <tr>
-        <td colspan="10" class="text-center text-muted py-4">Chưa có chuyến xe hay khoản phát sinh nào trong khoảng thời gian này.</td>
+        <td colspan="10" class="text-center text-muted py-4">Chưa có chuyến xe hay khoản phát sinh nào trong ngày này.</td>
     </tr>
 @endforelse

@@ -63,16 +63,16 @@
         </div>
         <div class="col-md-6">
             <div class="mb-3">
-                <label for="driver_id" class="form-label">Tài xế <span class="text-danger">*</span></label>
-                <select class="form-select select2" id="driver_id" name="driver_id" required data-placeholder="-- Chọn tài xế --">
-                    <option value="">-- Chọn tài xế --</option>
+                <label for="driver_id" class="form-label">Tài xế</label>
+                <select class="form-select select2" id="driver_id" name="driver_id" data-placeholder="-- Chưa xác định tài xế --">
+                    <option value="">-- Chưa xác định tài xế --</option>
                     @foreach($employees as $employee)
                         <option value="{{ $employee->id }}" {{ old('driver_id', $trip->driver_id) == $employee->id ? 'selected' : '' }}>
                             {{ $employee->name }}
                         </option>
                     @endforeach
                 </select>
-                <div class="invalid-feedback">Vui lòng chọn tài xế.</div>
+                <div class="form-text">Có thể bỏ trống nếu chưa xác định tài xế.</div>
             </div>
         </div>
     </div>

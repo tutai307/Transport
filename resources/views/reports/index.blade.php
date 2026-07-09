@@ -84,7 +84,7 @@
                     <td>{{ $trip->trip_date->format('d/m/Y') }}</td>
                     <td>{{ $trip->project->name }}</td>
                     <td>{{ $trip->vehicle->plate_number }}</td>
-                    <td>{{ $trip->driver->name }}</td>
+                    <td>{{ $trip->driver_name_snapshot ?? optional($trip->driver)->name ?? '—' }}</td>
                     <td>{{ $trip->material->name }}</td>
                     <td>{{ $trip->route->full_name }}</td>
                     <td class="text-end">{{ intval($trip->quantity) }}</td>

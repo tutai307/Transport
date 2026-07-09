@@ -74,6 +74,8 @@ Route::middleware('auth')->group(function () {
     // API endpoints cho auto-fill (dùng bởi JavaScript)
     Route::get('api/vehicles/{vehicle}/default-driver', [TripController::class, 'getVehicleDefaultDriver'])->name('api.vehicle-default-driver');
     Route::post('api/routes/quick-create', [RouteController::class, 'quickStore'])->name('api.routes.quick-create');
+    Route::post('api/vehicles/quick-create', [VehicleController::class, 'quickStore'])->name('api.vehicles.quick-create');
+    Route::patch('api/routes/{route}/price', [RouteController::class, 'updatePrice'])->name('api.routes.update-price');
 
     // Profile (từ Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

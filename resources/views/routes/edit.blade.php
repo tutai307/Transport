@@ -38,6 +38,12 @@
                value="{{ old('distance_km', $route->distance_km) }}">
     </div>
 
+    <div class="mb-3">
+        <label for="price" class="form-label">Giá cước</label>
+        <input type="text" class="form-control currency-input" id="price" name="price"
+               value="{{ old('price', (int) $route->price) }}">
+    </div>
+
     <div class="mb-3 form-check form-switch">
         <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1"
                {{ old('is_active', $route->is_active) ? 'checked' : '' }}>

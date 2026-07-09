@@ -209,4 +209,33 @@
         </table>
     </div>
 </div>
+
+{{-- Thống kê theo Cung chặng --}}
+<div class="card mb-5 shadow-sm">
+    <div class="card-header bg-dark text-white">
+        <i class="bi bi-signpost-split"></i> Thống kê theo cung chặng
+    </div>
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Cung chặng</th>
+                    <th class="text-end">Số chuyến</th>
+                    <th class="text-end">Tổng cước</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($byRoute as $row)
+                    <tr>
+                        <td class="fw-semibold">{{ $row['route'] }}</td>
+                        <td class="text-end">{{ intval($row['trip_count']) }}</td>
+                        <td class="text-end text-success fw-bold">{{ number_format($row['total_price'], 0, ',', '.') }}đ</td>
+                    </tr>
+                @empty
+                    <tr><td colspan="3" class="text-center text-muted py-3">—</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
 @endsection
