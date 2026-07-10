@@ -790,7 +790,8 @@ async function showDetails(vehicleId, plate, driverName) {
             </div>
             <p class="text-end text-muted small mb-0">Tổng: <strong class="text-primary">${list.length} chuyến</strong></p>`;
     } catch (e) {
-        document.getElementById('detailBody').innerHTML = `<div class="alert alert-danger">${e.message}</div>`;
+        document.getElementById('detailBody').innerHTML = `<p class="text-danger p-3 mb-0"><i class="bi bi-exclamation-circle"></i> ${e.message}</p>`;
+        window.showToast(e.message, 'error');
     }
 }
 
@@ -855,8 +856,9 @@ async function showCommitModal() {
                 </table>
             </div>`;
     } catch (e) {
-        document.getElementById('commitBody').innerHTML = `<div class="alert alert-danger">${e.message}</div>`;
+        document.getElementById('commitBody').innerHTML = `<p class="text-danger p-3 mb-0"><i class="bi bi-exclamation-circle"></i> ${e.message}</p>`;
         document.getElementById('btnConfirmCommit').disabled = true;
+        window.showToast(e.message, 'error');
     }
 }
 

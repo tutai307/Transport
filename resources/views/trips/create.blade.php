@@ -30,16 +30,6 @@
         <form method="POST" action="{{ route('trips.store') }}" id="tripForm" class="needs-validation" novalidate>
             @csrf
 
-            @if($errors->any())
-                <div class="alert alert-danger">
-                    <ul class="mb-0">
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
             <div class="row">
                 @if(request('project_id'))
                     <div class="col-md-12">
@@ -136,12 +126,14 @@
                         <div class="d-flex align-items-center gap-2">
                             <select class="form-select select2" id="route_id" name="route_id" required data-placeholder="-- Chọn cung chặng --">
                                 <option value="">-- Chọn cung chặng --</option>
-                                @if($selectedRoute)
-                                    <option value="{{ $selectedRoute->id }}" data-price="{{ (int) $selectedRoute->price }}" selected>
-                                        {{ $selectedRoute->from_location }} → {{ $selectedRoute->to_location }}
+                                @foreach($selectedRoutes as $route)
+                                    <option value="{{ $route->id }}" data-price="{{ (int) $route->price }}"
+                                            {{ $selectedRoute && $selectedRoute->id == $route->id ? 'selected' : '' }}>
+                                        {{ $route->from_location }} → {{ $route->to_location }}
                                     </option>
-                                @endif
+                                @endforeach
                             </select>
+                            <input type="hidden" name="selected_route_ids" id="selected_route_ids" value="{{ implode(',', $selectedRouteIds) }}">
                             <button type="button" class="btn btn-outline-primary text-nowrap" data-bs-toggle="modal" data-bs-target="#routePriceModal">
                                 <i class="bi bi-signpost-split"></i> Danh sách cung chặng
                             </button>
@@ -530,7 +522,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
         .then(function() { updateRecentTrips(); })
         .catch(function() {
-            alert('Có lỗi xảy ra khi xoá.');
+            window.showToast('Có lỗi xảy ra khi xoá.', 'error');
             if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-trash"></i>'; }
         });
     });
@@ -583,7 +575,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
             .then(function() { updateRecentTrips(); })
             .catch(function() {
-                alert('Có lỗi xảy ra khi xoá.');
+                window.showToast('Có lỗi xảy ra khi xoá.', 'error');
                 if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-trash"></i>'; }
             });
         });

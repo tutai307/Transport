@@ -10,14 +10,6 @@
     @csrf
     @method('PUT')
 
-    @if($errors->any())
-        <div class="alert alert-danger">
-            @foreach($errors->all() as $error)
-                <div>{{ $error }}</div>
-            @endforeach
-        </div>
-    @endif
-
     <div class="mb-3">
         <label for="plate_number" class="form-label">Biển số xe <span class="text-danger">*</span></label>
         <input type="text" class="form-control" id="plate_number" name="plate_number"

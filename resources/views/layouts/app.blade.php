@@ -337,24 +337,21 @@
 
         {{-- Main content --}}
         <div class="content-area p-3 p-md-4">
-            {{-- Flash messages --}}
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert" id="flash-success">
-                    <i class="bi bi-check-circle"></i> {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
-
-            @if(session('error'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="bi bi-exclamation-circle"></i> {{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
-
             @yield('content')
         </div>
     </div>
+
+    {{-- Toast container (global notifications) --}}
+    <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer" style="z-index: 1090;"></div>
+
+    {{-- Flash / validation errors bootstrapped to JS on page load --}}
+    <script id="flashPayload" type="application/json">@json([
+        'success' => session('success'),
+        'error'   => session('error'),
+        'warning' => session('warning'),
+        'info'    => session('info'),
+        'errors'  => $errors->all(),
+    ])</script>
 
     {{-- Mobile Bottom Nav --}}
     <div class="mobile-bottom-nav d-md-none">
@@ -413,14 +410,63 @@
             }
         }
 
-        // Auto-dismiss flash message sau 5 giây
-        setTimeout(function() {
-            const flash = document.getElementById('flash-success');
-            if (flash) {
-                const bsAlert = bootstrap.Alert.getOrCreateInstance(flash);
-                bsAlert.close();
+        // --- Toast notifications (global) ---
+        // Sử dụng: window.showToast('Nội dung', 'success'|'error'|'warning'|'info', { delay: 5000 })
+        (function() {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            const TYPE_MAP = {
+                success: { bg: 'text-bg-success', icon: 'bi-check-circle-fill' },
+                error:   { bg: 'text-bg-danger',  icon: 'bi-exclamation-circle-fill' },
+                danger:  { bg: 'text-bg-danger',  icon: 'bi-exclamation-circle-fill' },
+                warning: { bg: 'text-bg-warning', icon: 'bi-exclamation-triangle-fill' },
+                info:    { bg: 'text-bg-info',    icon: 'bi-info-circle-fill' },
+            };
+
+            function escapeHtml(str) {
+                return String(str)
+                    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
             }
-        }, 5000);
+
+            window.showToast = function(message, type, options) {
+                if (!message) return;
+                const cfg = TYPE_MAP[type] || TYPE_MAP.info;
+                const delay = (options && options.delay) || 5000;
+
+                const el = document.createElement('div');
+                el.className = `toast align-items-center ${cfg.bg} border-0 shadow`;
+                el.setAttribute('role', 'alert');
+                el.setAttribute('aria-live', 'assertive');
+                el.setAttribute('aria-atomic', 'true');
+                el.innerHTML = `
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="bi ${cfg.icon} me-1"></i> ${escapeHtml(message)}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>`;
+                container.appendChild(el);
+
+                const toast = new bootstrap.Toast(el, { delay: delay, autohide: true });
+                el.addEventListener('hidden.bs.toast', () => el.remove());
+                toast.show();
+                return toast;
+            };
+
+            // Auto-fire các toast từ server-side flash + validation errors
+            const payloadEl = document.getElementById('flashPayload');
+            if (!payloadEl) return;
+            let payload;
+            try { payload = JSON.parse(payloadEl.textContent); } catch (e) { return; }
+
+            if (payload.success) window.showToast(payload.success, 'success');
+            if (payload.error)   window.showToast(payload.error,   'error');
+            if (payload.warning) window.showToast(payload.warning, 'warning');
+            if (payload.info)    window.showToast(payload.info,    'info');
+            (payload.errors || []).forEach(msg => window.showToast(msg, 'error'));
+        })();
 
         // --- Currency Formatting ---
         function formatCurrency(input) {

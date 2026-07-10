@@ -205,6 +205,22 @@ class TripController extends Controller
         $selectedRouteId = old('route_id', $request->get('route_id'));
         $selectedRoute = $selectedRouteId ? Route::find($selectedRouteId) : null;
 
+        // Danh sách các cung chặng người dùng đã tick trong modal (giữ qua "Lưu & Thêm mới").
+        // Ưu tiên từ old() để trả về đúng state khi validation fail, sau đó tới query param.
+        $selectedRouteIdsRaw = old('selected_route_ids', $request->get('selected_route_ids', []));
+        if (is_string($selectedRouteIdsRaw)) {
+            $selectedRouteIdsRaw = array_filter(explode(',', $selectedRouteIdsRaw));
+        }
+        $selectedRouteIds = array_values(array_unique(array_map('intval', (array) $selectedRouteIdsRaw)));
+        if ($selectedRoute && !in_array($selectedRoute->id, $selectedRouteIds, true)) {
+            $selectedRouteIds[] = $selectedRoute->id;
+        }
+        $selectedRoutes = !empty($selectedRouteIds)
+            ? Route::whereIn('id', $selectedRouteIds)->get()->sortBy(function ($r) use ($selectedRouteIds) {
+                return array_search($r->id, $selectedRouteIds);
+            })->values()
+            : collect();
+
         // --- Fetch trips and salary adjustments của ngày đang nhập cho bảng bên dưới ---
         $filterDate = $request->get('filter_date', $request->get('trip_date', date('Y-m-d')));
         $projectId = $request->get('project_id');
@@ -241,7 +257,7 @@ class TripController extends Controller
 
         return view('trips.create', compact(
             'projects', 'vehicles', 'employees', 'materials', 'routes', 'selectedRoute',
-            'recentTrips', 'filterDate'
+            'selectedRoutes', 'selectedRouteIds', 'recentTrips', 'filterDate'
         ));
     }
 
@@ -269,6 +285,11 @@ class TripController extends Controller
 
         // Nếu nhấn "Lưu & Thêm mới"
         if ($request->has('save_and_new')) {
+            // Giữ lại danh sách cung chặng đã tick trong modal để không phải chọn lại.
+            $selectedRouteIds = array_values(array_filter(array_map('intval',
+                explode(',', (string) $request->input('selected_route_ids', ''))
+            )));
+
             return redirect()->route('trips.create', [
                 'trip_date' => $validated['trip_date'],
                 'project_id' => $validated['project_id'],
@@ -277,6 +298,7 @@ class TripController extends Controller
                 'material_id' => $validated['material_id'],
                 'route_id' => $validated['route_id'],
                 'freight_price' => $validated['freight_price'],
+                'selected_route_ids' => $selectedRouteIds,
             ])->with('success', 'Đã lưu chuyến xe. Tiếp tục thêm mới.');
         }
 
@@ -333,12 +355,13 @@ class TripController extends Controller
 
         $trip->update($validated);
 
-        // Redirect về trang tháng tương ứng
+        // Redirect về trang chi tiết ngày (nơi user đã vào edit)
         $date = \Carbon\Carbon::parse($validated['trip_date']);
-        return redirect()->route('trips.by-month', [
+        return redirect()->route('trips.by-day', [
             'project' => $validated['project_id'],
             'year' => $date->year,
             'month' => $date->month,
+            'day' => $date->day,
         ])->with('success', 'Đã cập nhật chuyến xe.');
     }
 

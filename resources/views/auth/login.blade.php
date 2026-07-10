@@ -10,14 +10,6 @@
                 <p class="text-muted">Đăng nhập để tiếp tục</p>
             </div>
 
-            @if($errors->any())
-                <div class="alert alert-danger">
-                    @foreach($errors->all() as $error)
-                        <div>{{ $error }}</div>
-                    @endforeach
-                </div>
-            @endif
-
             <form method="POST" action="{{ route('login') }}">
                 @csrf
                 <div class="mb-3">

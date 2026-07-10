@@ -23,7 +23,6 @@
                     </select>
                     <small class="text-muted">Có thể bỏ trống nếu xe mới chưa biết tài xế.</small>
                 </div>
-                <div id="quickVehicleError" class="alert alert-danger d-none mb-0"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
@@ -57,7 +56,6 @@ document.addEventListener('DOMContentLoaded', function() {
     modalEl.addEventListener('hidden.bs.modal', function() {
         document.getElementById('quickVehiclePlate').value = '';
         $('#quickVehicleDriver').val('').trigger('change');
-        document.getElementById('quickVehicleError').classList.add('d-none');
     });
 
     document.getElementById('quickVehiclePlate').addEventListener('keydown', function(e) {
@@ -71,16 +69,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const plateInput = document.getElementById('quickVehiclePlate');
         const plate = plateInput.value.trim();
         const driverId = $('#quickVehicleDriver').val();
-        const errorDiv = document.getElementById('quickVehicleError');
         const btn = this;
 
         if (!plate) {
-            errorDiv.textContent = 'Vui lòng nhập biển số xe.';
-            errorDiv.classList.remove('d-none');
+            window.showToast('Vui lòng nhập biển số xe.', 'error');
             return;
         }
 
-        errorDiv.classList.add('d-none');
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Đang lưu...';
 
@@ -109,8 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(function(err) {
             const msg = (err && err.errors && err.errors.plate_number) ? err.errors.plate_number[0]
                 : (err && err.message) ? err.message : 'Có lỗi xảy ra, vui lòng thử lại.';
-            errorDiv.textContent = msg;
-            errorDiv.classList.remove('d-none');
+            window.showToast(msg, 'error');
         })
         .finally(function() {
             btn.disabled = false;

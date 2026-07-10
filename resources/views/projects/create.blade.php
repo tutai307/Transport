@@ -9,14 +9,6 @@
 <form method="POST" action="{{ route('projects.store') }}" style="max-width: 600px;" class="needs-validation" novalidate>
     @csrf
 
-    @if($errors->any())
-        <div class="alert alert-danger">
-            @foreach($errors->all() as $error)
-                <div>{{ $error }}</div>
-            @endforeach
-        </div>
-    @endif
-
     <div class="mb-3">
         <label for="name" class="form-label">Tên dự án <span class="text-danger">*</span></label>
         <input type="text" class="form-control" id="name" name="name" value="{{ old('name') }}" required autofocus>

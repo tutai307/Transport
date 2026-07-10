@@ -17,7 +17,6 @@
                     <label class="form-label">Điểm đến <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="createRouteTo" placeholder="Ví dụ: Công trình B...">
                 </div>
-                <div id="createRouteError" class="alert alert-danger d-none mb-0"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
@@ -67,7 +66,6 @@ document.addEventListener('DOMContentLoaded', function() {
         var parts = term.split(/\s*[→>]\s*/);
         document.getElementById('createRouteFrom').value = parts[0] ? parts[0].trim() : '';
         document.getElementById('createRouteTo').value   = parts[1] ? parts[1].trim() : '';
-        document.getElementById('createRouteError').classList.add('d-none');
 
         var modal = new bootstrap.Modal(document.getElementById('createRouteModal'));
         modal.show();
@@ -94,16 +92,13 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('btnSaveRoute').addEventListener('click', function() {
         var from     = document.getElementById('createRouteFrom').value.trim();
         var to       = document.getElementById('createRouteTo').value.trim();
-        var errorDiv = document.getElementById('createRouteError');
         var btn      = this;
 
         if (!from || !to) {
-            errorDiv.textContent = 'Vui lòng nhập đầy đủ điểm đi và điểm đến.';
-            errorDiv.classList.remove('d-none');
+            window.showToast('Vui lòng nhập đầy đủ điểm đi và điểm đến.', 'error');
             return;
         }
 
-        errorDiv.classList.add('d-none');
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Đang lưu...';
 
@@ -129,9 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('createRouteTo').value   = '';
         })
         .catch(function(err) {
-            var msg = (err && err.message) ? err.message : 'Có lỗi xảy ra, vui lòng thử lại.';
-            errorDiv.textContent = msg;
-            errorDiv.classList.remove('d-none');
+            window.showToast((err && err.message) ? err.message : 'Có lỗi xảy ra, vui lòng thử lại.', 'error');
         })
         .finally(function() {
             btn.disabled = false;

@@ -9,14 +9,6 @@
 <form method="POST" action="{{ route('vehicles.store') }}" style="max-width: 600px;" class="needs-validation" novalidate>
     @csrf
 
-    @if($errors->any())
-        <div class="alert alert-danger">
-            @foreach($errors->all() as $error)
-                <div>{{ $error }}</div>
-            @endforeach
-        </div>
-    @endif
-
     <div class="mb-3">
         <label for="plate_number" class="form-label">Biển số xe <span class="text-danger">*</span></label>
         <input type="text" class="form-control" id="plate_number" name="plate_number" value="{{ old('plate_number') }}" required autofocus

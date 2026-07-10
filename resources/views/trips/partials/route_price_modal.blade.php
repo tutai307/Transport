@@ -25,7 +25,7 @@
                                 <tr data-route-id="{{ $route->id }}" data-from="{{ $route->from_location }}" data-to="{{ $route->to_location }}">
                                     <td class="text-center">
                                         <input type="checkbox" class="form-check-input route-select-checkbox"
-                                               {{ $selectedRoute && $selectedRoute->id == $route->id ? 'checked' : '' }}>
+                                               {{ in_array($route->id, $selectedRouteIds ?? []) ? 'checked' : '' }}>
                                     </td>
                                     <td>{{ $route->from_location }} → {{ $route->to_location }}</td>
                                     <td class="text-end">
@@ -61,7 +61,6 @@
                         </button>
                     </div>
                 </div>
-                <div id="routePriceError" class="alert alert-danger d-none mt-2 mb-0 py-2"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
@@ -80,7 +79,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const tbody = document.getElementById('routePriceTableBody');
     const routeSelect = document.getElementById('route_id');
     const freightInput = document.getElementById('freight_price');
-    const routePriceError = document.getElementById('routePriceError');
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
     function formatVnd(n) {
@@ -106,23 +104,27 @@ document.addEventListener('DOMContentLoaded', function() {
             .map(cb => cb.closest('tr'));
 
         if (checkedRows.length === 0) {
-            routePriceError.textContent = 'Vui lòng tick chọn ít nhất 1 cung chặng.';
-            routePriceError.classList.remove('d-none');
+            window.showToast('Vui lòng tick chọn ít nhất 1 cung chặng.', 'error');
             return;
         }
-        routePriceError.classList.add('d-none');
 
         const currentValue = routeSelect.value;
         let options = '<option value="">-- Chọn cung chặng --</option>';
+        const checkedIds = [];
         checkedRows.forEach(function(row) {
             const id = row.dataset.routeId;
             const label = `${row.dataset.from} → ${row.dataset.to}`;
             const price = parseVnd(row.querySelector('.price-input').value);
             const selectedAttr = id === currentValue ? 'selected' : '';
             options += `<option value="${id}" data-price="${price}" ${selectedAttr}>${label}</option>`;
+            checkedIds.push(id);
         });
 
         $(routeSelect).html(options).trigger('change');
+
+        // Đồng bộ hidden input để giữ danh sách cung chặng qua "Lưu & Thêm mới"
+        const hiddenInput = document.getElementById('selected_route_ids');
+        if (hiddenInput) hiddenInput.value = checkedIds.join(',');
 
         const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
         bsModal.hide();
@@ -174,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (option) option.dataset.price = data.price;
             })
             .catch(function() {
-                alert('Có lỗi xảy ra khi lưu giá cước.');
+                window.showToast('Có lỗi xảy ra khi lưu giá cước.', 'error');
             })
             .finally(function() {
                 btn.disabled = false;
@@ -187,19 +189,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const fromInput = document.getElementById('newRouteFrom');
         const toInput = document.getElementById('newRouteTo');
         const priceInput = document.getElementById('newRoutePrice');
-        const errorDiv = document.getElementById('routePriceError');
         const from = fromInput.value.trim();
         const to = toInput.value.trim();
         const price = parseVnd(priceInput.value);
         const btn = this;
 
         if (!from || !to) {
-            errorDiv.textContent = 'Vui lòng nhập đầy đủ điểm đi và điểm đến.';
-            errorDiv.classList.remove('d-none');
+            window.showToast('Vui lòng nhập đầy đủ điểm đi và điểm đến.', 'error');
             return;
         }
 
-        errorDiv.classList.add('d-none');
         btn.disabled = true;
 
         fetch('{{ route("api.routes.quick-create") }}', {
@@ -239,8 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
             priceInput.value = '0';
         })
         .catch(function(err) {
-            errorDiv.textContent = (err && err.message) ? err.message : 'Có lỗi xảy ra, vui lòng thử lại.';
-            errorDiv.classList.remove('d-none');
+            window.showToast((err && err.message) ? err.message : 'Có lỗi xảy ra, vui lòng thử lại.', 'error');
         })
         .finally(function() {
             btn.disabled = false;
