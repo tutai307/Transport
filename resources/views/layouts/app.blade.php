@@ -345,13 +345,16 @@
     <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer" style="z-index: 1090;"></div>
 
     {{-- Flash / validation errors bootstrapped to JS on page load --}}
-    <script id="flashPayload" type="application/json">@json([
-        'success' => session('success'),
-        'error'   => session('error'),
-        'warning' => session('warning'),
-        'info'    => session('info'),
-        'errors'  => $errors->all(),
-    ])</script>
+    @php
+        $flashPayload = [
+            'success' => session('success'),
+            'error'   => session('error'),
+            'warning' => session('warning'),
+            'info'    => session('info'),
+            'errors'  => $errors->all(),
+        ];
+    @endphp
+    <script id="flashPayload" type="application/json">{!! json_encode($flashPayload, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}</script>
 
     {{-- Mobile Bottom Nav --}}
     <div class="mobile-bottom-nav d-md-none">
