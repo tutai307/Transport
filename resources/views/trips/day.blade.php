@@ -95,10 +95,18 @@
                         <td class="text-end">{{ number_format($trip->freight_price, 0, ',', '.') }}đ</td>
                         <td class="text-end fw-bold text-success">{{ number_format($trip->total_price, 0, ',', '.') }}đ</td>
                         <td class="small text-muted">{{ Str::limit($trip->note, 25) }}</td>
-                        <td>
-                            <a href="{{ route('trips.edit', $trip) }}" class="btn btn-sm btn-outline-primary">
+                        <td class="text-nowrap">
+                            <a href="{{ route('trips.edit', $trip) }}" class="btn btn-sm btn-outline-primary" title="Sửa">
                                 <i class="bi bi-pencil"></i>
                             </a>
+                            <form method="POST" action="{{ route('trips.destroy', $trip) }}" class="d-inline js-delete-trip-form">
+                                @csrf
+                                @method('DELETE')
+                                <button type="button" class="btn btn-sm btn-outline-danger js-delete-trip-btn" title="Xoá"
+                                        data-label="Xe {{ $trip->vehicle_plate_snapshot ?? optional($trip->vehicle)->plate_number ?? '—' }} — {{ intval($trip->quantity) }} chuyến">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 @empty
@@ -238,4 +246,50 @@
         </table>
     </div>
 </div>
+{{-- Modal xác nhận xoá chuyến xe --}}
+<div class="modal fade" id="deleteTripModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill"></i> Xác nhận xoá chuyến xe</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body py-4">
+                <p class="mb-2">Bạn có chắc chắn muốn xoá chuyến xe này?</p>
+                <p class="mb-0 text-muted small" id="deleteTripDetail"></p>
+                <small class="text-danger d-block mt-2">Hành động này không thể hoàn tác.</small>
+            </div>
+            <div class="modal-footer bg-light border-0">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger px-4" id="btnConfirmDeleteTrip">Xoá</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modalEl = document.getElementById('deleteTripModal');
+    const detailEl = document.getElementById('deleteTripDetail');
+    const confirmBtn = document.getElementById('btnConfirmDeleteTrip');
+    const modal = new bootstrap.Modal(modalEl);
+    let pendingForm = null;
+
+    document.querySelectorAll('.js-delete-trip-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            pendingForm = btn.closest('form');
+            detailEl.textContent = btn.dataset.label || '';
+            modal.show();
+        });
+    });
+
+    confirmBtn.addEventListener('click', function() {
+        if (!pendingForm) return;
+        confirmBtn.disabled = true;
+        pendingForm.submit();
+    });
+});
+</script>
+@endpush
 @endsection

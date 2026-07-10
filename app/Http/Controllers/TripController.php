@@ -375,10 +375,11 @@ class TripController extends Controller
             return response()->json(['success' => true]);
         }
 
-        return redirect()->route('trips.by-month', [
+        return redirect()->route('trips.by-day', [
             'project' => $projectId,
             'year' => $date->year,
             'month' => $date->month,
+            'day' => $date->day,
         ])->with('success', 'Đã xoá chuyến xe.');
     }
 
