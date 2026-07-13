@@ -181,6 +181,27 @@ document.addEventListener('DOMContentLoaded', function() {
         if (this.value === '') this.value = '0';
     });
 });
+
+// Auto-fill tài xế mặc định khi đổi xe.
+// Người dùng vẫn có thể override.
+$('#vehicle_id').on('select2:select change', function() {
+    const vehicleId = $(this).val();
+    if (!vehicleId) return;
+
+    fetch(`/api/vehicles/${vehicleId}/default-driver`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+        if (!data || !data.driver_id) return;
+        const driverSelect = $('#driver_id');
+        if (driverSelect.find(`option[value="${data.driver_id}"]`).length === 0) {
+            driverSelect.append(new Option(data.driver_name, data.driver_id, false, false));
+        }
+        driverSelect.val(String(data.driver_id)).trigger('change');
+    })
+    .catch(() => { /* silent — user vẫn có thể chọn tài xế thủ công */ });
+});
 </script>
 @endpush
 

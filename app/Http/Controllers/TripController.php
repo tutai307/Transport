@@ -330,6 +330,11 @@ class TripController extends Controller
         $materials = Material::active()->orderBy('name')->get();
         $routes = Route::active()->get();
 
+        // Đảm bảo tài xế hiện tại của chuyến vẫn hiển thị trong dropdown dù đã bị vô hiệu hoá.
+        if ($trip->driver_id && !$employees->contains('id', $trip->driver_id)) {
+            $employees = $employees->push($trip->driver)->sortBy('name')->values();
+        }
+
         return view('trips.edit', compact('trip', 'projects', 'vehicles', 'employees', 'materials', 'routes'));
     }
 

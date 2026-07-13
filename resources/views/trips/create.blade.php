@@ -405,10 +405,12 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(r => r.ok ? r.json() : null)
         .then(data => {
-            if (!data) return;
-            if (data.driver_id) {
-                $('#driver_id').val(String(data.driver_id)).trigger('change');
+            if (!data || !data.driver_id) return;
+            const driverSelect = $('#driver_id');
+            if (driverSelect.find(`option[value="${data.driver_id}"]`).length === 0) {
+                driverSelect.append(new Option(data.driver_name, data.driver_id, false, false));
             }
+            driverSelect.val(String(data.driver_id)).trigger('change');
         })
         .catch(() => { /* silent — user vẫn có thể chọn tài xế thủ công */ });
     });
