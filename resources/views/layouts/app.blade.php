@@ -310,6 +310,9 @@
                 <a class="nav-link {{ request()->routeIs('payroll.*') ? 'active' : '' }}" href="{{ route('payroll.index') }}">
                     <i class="bi bi-wallet2"></i> Tính lương
                 </a>
+                <a class="nav-link {{ request()->routeIs('vehicle-stats.*') ? 'active' : '' }}" href="{{ route('vehicle-stats.index') }}">
+                    <i class="bi bi-truck-front"></i> Thống kê theo xe
+                </a>
 
                 <hr class="mx-3 my-2">
                 <div class="px-3 mb-2 small text-uppercase text-muted fw-bold" style="font-size: 11px; letter-spacing: 1px;">Hệ thống</div>

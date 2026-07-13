@@ -9,6 +9,7 @@ use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\RouteController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\PayrollController;
+use App\Http\Controllers\VehicleStatController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -70,6 +71,12 @@ Route::middleware('auth')->group(function () {
     Route::get('payroll/driver/{employee}/export', [PayrollController::class, 'export'])->name('payroll.export');
     Route::get('payroll/driver/{employee}/{year}', [PayrollController::class, 'byYear'])->name('payroll.by-year');
     Route::get('payroll/driver/{employee}/{year}/{month}', [PayrollController::class, 'byMonth'])->name('payroll.by-month');
+
+    // Thống kê theo xe — luồng: Xe → Năm → Tháng → Danh sách chuyến
+    Route::get('vehicle-stats', [VehicleStatController::class, 'index'])->name('vehicle-stats.index');
+    Route::get('vehicle-stats/{vehicle}', [VehicleStatController::class, 'byVehicle'])->name('vehicle-stats.by-vehicle');
+    Route::get('vehicle-stats/{vehicle}/{year}', [VehicleStatController::class, 'byYear'])->name('vehicle-stats.by-year');
+    Route::get('vehicle-stats/{vehicle}/{year}/{month}', [VehicleStatController::class, 'byMonth'])->name('vehicle-stats.by-month');
 
     // API endpoints cho auto-fill (dùng bởi JavaScript)
     Route::get('api/vehicles/{vehicle}/default-driver', [TripController::class, 'getVehicleDefaultDriver'])->name('api.vehicle-default-driver');
